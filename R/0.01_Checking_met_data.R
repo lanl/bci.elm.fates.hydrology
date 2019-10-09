@@ -27,14 +27,14 @@ for(i in 1: length(file.names)){
   time.df$time.stamp[i] <- ncatt_get(nc,"time","units")$value
 }
 View(time.df)
-start.month = 1 # since no data in first file 1985-01
+start.month = 1 
 ## datetime column is created based on the start and end months of files available and filling up at hourly freq
 # rnames <- seq(from = as.POSIXct(paste0(months[start.month], "-01 0:00"), tz = "America/Cayman"), 
 #               to = as.POSIXct(paste0(months[length(months)], "-31 23:00"), tz = "America/Cayman"), by = "1 hour")
 # head(rnames)
 # 
 # start.month = 384
-ncin <- nc_open("data-raw/ConvertMetCSVtoCLM-expand-format/NCOut/bci_0.1x0.1_met.v5.1/CLM1PT_data/2016-02.nc", write = F)
+ncin <- nc_open("data-raw/ConvertMetCSVtoCLM-expand-format/NCOut/bci_0.1x0.1_met.v5.1/CLM1PT_data/2016-01.nc", write = F)
 val1 <- ncvar_get(ncin, "PRECTmms")
 length(val1)
 tunits1 <- ncatt_get(ncin,"time","units")
@@ -129,7 +129,8 @@ nc.dat.yr <- nc.dat %>% subset(!is.na(year) & year != 2019) %>%
   group_by(year) %>%
   summarise(rain = sum(PRECTmms, na.rm = TRUE)*60*60) # mms*60*60 = mm/hr. Since data is given every hour summed over a year, it is in mm.
 ggplot(nc.dat.yr, aes(x = year, y = rain)) +
-  geom_bar(stat = "identity")
+  geom_bar(stat = "identity") + ggtitle("Annual rainfall at BCI from 1985 through 2018 from metv5.1 .nc files")
+ggsave(file.path(paste0("figures/met/Annual rainfall at BCI from 1985 through 2018 from metv5.1 .nc file.jpeg")), height = 10, width = 20, units='in')
 
 xx <- nc.dat %>% subset(year == 2017)
 View(xx)
@@ -140,9 +141,9 @@ ggplot(xx.long, aes(x = datetime, y = value)) +
   geom_point() + 
   facet_wrap( ~ variable, scales = "free_y")
 ###-------------------
-### Boris's data
+### Boris's data - 2018 substituted by rutuja
 ###-------------------
-raw.dat <- read.csv("data-raw/BCI_1985_2018c_mod.csv")
+raw.dat <- read.csv("data-raw/BCI_1985_2018c_mod_2018substituted.csv")
 str(raw.dat)
 # converting to system time zone
 
@@ -276,6 +277,7 @@ g1 <- ggplot(nc.dat.1.sub, aes(x = month, y = rain)) +
 g1 +   ggtitle("Monthly rainfall at BCI from 1985 through 2018")
 ggsave(file.path(paste0("figures/met/Monthly rainfall at BCI from 1985 through 2018.jpeg")), height = 10, width = 20, units='in')
 
+nc.dat.1.sub$year <- format(nc.dat.1.sub$month, "%Y")
 g1 %+% subset(nc.dat.1.sub,  year %in% c(2015, 2016, 2017, 2018)) +
   scale_x_date(date_breaks = "2 month", labels = function(x) format(x, "%b%y")) +
   ggtitle("Monthly rainfall at BCI from 2015 through 2018")

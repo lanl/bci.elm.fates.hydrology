@@ -26,5 +26,10 @@ cd $CASE_ROOT/BCI/bci_0.1x0.1_v4.0i/
   end
   
 ## new
-surf.par_arr <- rep(c(1:20), each = 100); paste(surf.par_arr, collapse=",")
-param_arr <- rep(c(1:100), length.out = 2000); paste(param_arr, collapse=",")
+total.n <- 2000
+fates.n <- 100; surf.n <- 20
+surf.par_arr <- rep(c(1:surf.n), each = fates.n); paste(surf.par_arr, collapse=",")
+param_arr <- rep(c(1:fates.n), length.out = total.n); paste(param_arr, collapse=",")
+## so that all surf.par are covered in first few iterations, this should be changed to:
+surf.par_arr <- rep(c(1:surf.n), length.out = total.n); paste(surf.par_arr, collapse=",")
+param_arr <- rep(c(1:fates.n), each = surf.n); paste(param_arr, collapse=",")

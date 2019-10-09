@@ -1,9 +1,14 @@
 # https://jasonstitt.com/gitignore-whitelisting-patterns
+# Ignore everything
 *
+# But descend into directories
 !*/
+# Un-ignore specific files under subtree
 !data-raw/*.R
-!/data/**
-data/mettower_minute.Rda
+## Recursively allow files under subtree
+#!/data/**
+## but not these files
+data/**.csv
 !.gitignore
 !Readme.rmd
 
