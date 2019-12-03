@@ -9,15 +9,20 @@ extractres_h0 <-
            scale.vec,
            filterFile,
            start.year,
-           end.year) {
+           end.year,
+           current.folder) {
     nmonth <- 12
     nyears <- end.year - start.year + 1
     ncol <- nmonth * nyears
+    # filter.arr <-
+    #    read.table(file.path(wd, filterFile), header = F) # on server
     filter.arr <-
-       read.table(file.path(wd, filterFile), header = F) # on server
-    # filter.arr <- read.table(file.path(wd, "data-raw", filterFile), header = F) # on desktop
+      read.table(file.path("data-raw/extract/", current.folder, filterFile), header = F) # on desktop
+    # sam.vec <-
+    #  c(sam.start:sam.end)[filter.arr$V1[c(sam.start:sam.end)]]
     sam.vec <-
-      c(sam.start:sam.end)[filter.arr$V1[c(sam.start:sam.end)]]
+      c(sam.start:sam.end)[filter.arr$V1]
+
     nsam <- length(sam.vec)
     
     ## to get the length of value vector (for H2OSOI the number of depths)#-----
@@ -87,7 +92,7 @@ extractres_h0 <-
           nc_close(nc)
         }
       }
-      #if(i %% 200 == 0) print(i)
+      if(i %% 50 == 0) print(i)
     }
     for (v in 1:length(var.vec)) {
       var.name <- var.vec[v]
@@ -100,7 +105,7 @@ extractres_h0 <-
       var.res.arr <- res.arr[[v]]
       out.file.name <- paste0(var.name, ".h0.extract.Rdata")
       # save(var.res.arr, file = file.path(wd, "extract", out.file.name)) # on server
-      save(var.res.arr, file = file.path(wd, "data-raw", "extract", out.file.name)) # on desktop
+      save(var.res.arr, file = file.path("data-raw", "extract", current.folder, "extract", out.file.name)) # on desktop
     }
   }
 
@@ -114,7 +119,8 @@ extractres_h1 <-
            scale.vec,
            filterFile,
            start.year,
-           end.year) {
+           end.year,
+           current.folder) {
     cnames <- seq(from = as.Date(paste0(start.year, "-01-01")),
                        to = as.Date(paste0(end.year, "-12-31")),
                        by = 1)
@@ -122,14 +128,14 @@ extractres_h1 <-
     cnames <- cnames[format(cnames, "%m-%d") != "02-29"]
     ncol <- length(cnames)
     
-    filter.arr <- read.table(file.path(wd, filterFile), header = F) # on server
-    # filter.arr <-
-    #   read.table(file.path(wd, "data-raw", filterFile), header = F) # on desktop
+    # filter.arr <- read.table(file.path(wd, filterFile), header = F) # on server
+    filter.arr <-
+      read.table(file.path("data-raw/extract/", current.folder, filterFile), header = F) # on desktop
     
     ### temporarily turning some cases off, since some cases from 1:100 are not well run:
-    filter.arr$V1[c(1:100, 740)] <- FALSE
+    #filter.arr$V1[c(1:100, 740)] <- FALSE
     sam.vec <-
-      c(sam.start:sam.end)[filter.arr$V1[c(sam.start:sam.end)]]
+      c(sam.start:sam.end)#[filter.arr$V1[c(sam.start:sam.end)]] # turn this on after trial is finished
     nsam <- length(sam.vec)
     
     ## to get the length of value vector (for H2OSOI the number of depths)#-----
@@ -188,13 +194,13 @@ extractres_h1 <-
             for (k in 1:var.dim[v]) {
               res.arr[[v]][[k]][i, index.start:index.end] <- val[k,] * scale
             }
-          }
+          } 	
         }
         nc_close(nc)
       }
-      #print(i)
-      if (i %% 200 == 0)
-        print(i)
+      print(sample)
+      # if (i %% 200 == 0)
+      #  print(sample)
     }
     for (v in 1:length(var.vec)) {
       var.name <- var.vec[v]
@@ -206,8 +212,8 @@ extractres_h1 <-
       # data is stored as a list
       var.res.arr <- res.arr[[v]]
       out.file.name <- paste0(var.name, ".h1.extract.Rdata")
-      save(var.res.arr, file = file.path(wd, "extract", out.file.name)) # on server
-      # save(var.res.arr, file = file.path(wd, "data-raw", "extract", out.file.name)) # on desktop
+      # save(var.res.arr, file = file.path(wd, "extract", out.file.name)) # on server
+      save(var.res.arr, file = file.path("data-raw", "extract", current.folder, "extract", out.file.name)) # on desktop
     }
   }
 # load(file.path(wd, "data-raw", "extract", out.file.name))
@@ -220,7 +226,8 @@ extractres_h2 <-
            var.vec,
            scale.vec,
            start.year,
-           end.year) {
+           end.year,
+           current.folder) {
     cnames <-
       seq(from = as.POSIXct(paste0(start.year, "-01-01 00:00:00", tz = "UTC")),
                to = as.POSIXct(paste0(end.year, "-12-31 23:00:00", tz = "UTC")),
@@ -228,9 +235,9 @@ extractres_h2 <-
     cnames <- cnames[format(cnames, "%m-%d") != "02-29"]
     ncol <- length(cnames)
     
-    filter.arr <-
-      read.table(file.path(wd, filterFile), header = F) # on server
-    # filter.arr <- read.table(file.path(wd, "data-raw", filterFile), header = F) # on desktop
+    # filter.arr <-
+    #   read.table(file.path(wd, filterFile), header = F) # on server
+    filter.arr <- read.table(file.path("data-raw", filterFile), header = F) # on desktop
     sam.vec <-
       c(sam.start:sam.end)[filter.arr$V1[c(sam.start:sam.end)]]
     nsam <- length(sam.vec)
@@ -291,8 +298,7 @@ extractres_h2 <-
           }
           nc_close(nc)
         }
-      if (i %% 5)
-        print(i)
+      if (i %% 50 == 0) print(i)
     }
     for (k in 1:var.dim) {
       colnames(res.arr[[k]]) <- cnames
@@ -300,8 +306,8 @@ extractres_h2 <-
       # data is stored as a list
       var.res.arr <- res.arr[[v]]
       out.file.name <- paste0(var.name, ".h2.extract.Rdata")
-      save(var.res.arr, file = file.path(wd, "extract", out.file.name)) # on server
-      # save(var.res.arr, file = file.path(wd, "data-raw", "extract", out.file.name)) # on desktop
+      # save(var.res.arr, file = file.path(wd, "extract", out.file.name)) # on server
+      save(var.res.arr, file = file.path("data-raw", "extract", current.folder, "extract", out.file.name)) # on desktop
     }
   }
 ###-------
@@ -310,7 +316,7 @@ extractres_h2 <-
 # extractres_h0 <- function(nsam, outdir, filebase, var.name, filterFile, ###----
 #                           scale, start.year, end.year, out.file.name){
 #   #outdir<-"/lustre/scratch3/tursampleuoise/rutuja/ACME/cases"
-#   #filebase<-"BCI.ICLM45ED.badger.intel.Ccd65684b0-F64b5affb."
+#   #filebase<-"BCI.ICLM45ED.badger.intel.Cabfd064cb-Fc47f968e."
 #   #nsam<-8
 #   nmonth <- 12
 #   nyears <- end.year - start.year + 1

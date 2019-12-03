@@ -1,0 +1,18 @@
+---
+title: "Inversion"
+author: "Rutuja Chitra-Tarak"
+date: "11/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r Chunk 1, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+load(file.path("data-raw/4.1GLUEsetup_part2_BCI.RData")) 
+growth.data <- growth_by_si.info$growth.data
+knitr::include_graphics(file.path("figures", "sp_max.root_large_R-sq>0.5_med_growth_sp_by_size_#skIqAp.jpeg"))
+```
