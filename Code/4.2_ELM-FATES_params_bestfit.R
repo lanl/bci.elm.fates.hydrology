@@ -367,8 +367,8 @@ write.csv(wb.table.yrmo.all, file = file.path("results", current.folder, "wb.tab
 wb.table.long <- gather(wb.table, key = variable, value = value, -bioyear)
 p.wb.table <- ggplot(wb.table.long, aes(bioyear, variable, fill = value)) + 
   geom_tile() + #ylab("Depth [cm]") + xlab("Date") +   
-  #scale_fill_continuous("SWC [% v/v]", trans = "reverse")
-  scale_fill_viridis_c("", trans = "reverse", option = "plasma") +
+  #scale_fill_continuous("SWC [% v/v]", direction = -1)
+  scale_fill_viridis_c("", direction = -1, option = "plasma") +
   ggtitle("Water balance fluxes and source")
 
 run <- wb.table.yrmo %>% select(yrmo, RAIN, QRUNOFF, QDRAI, QOVER, obs.runoff, runoff.sim.obs) %>%
@@ -389,8 +389,8 @@ run.long <- run %>%
   gather(key = variable, value = value, -yrmo)
 ggplot(run.long, aes(yrmo, variable, fill = value)) + 
   geom_tile() + #ylab("Depth [cm]") + xlab("Date") +   
-  #scale_fill_continuous("SWC [% v/v]", trans = "reverse")
-  scale_fill_viridis_c("", trans = "reverse", option = "plasma") +
+  #scale_fill_continuous("SWC [% v/v]", direction = -1)
+  scale_fill_viridis_c("", direction = -1, option = "plasma") +
   ggtitle("Runoff terms")
 
 #*********-----------------------------
@@ -432,8 +432,8 @@ swc.d.long.sub.mean <- swc.d.long.sub %>%
 # Heatmap 
 swc.top.few <- ggplot(swc.d.long.sub.mean, aes(date, as.factor(-depth), fill = value*100)) + 
   geom_tile() + ylab("Depth [m]") + xlab("Date") +   
-  #scale_fill_continuous("SWC [% v/v]", trans = "reverse")
-  scale_fill_viridis_c("SWC [% v/v]", trans = "reverse", option = "plasma") +
+  #scale_fill_continuous("SWC [% v/v]", direction = -1)
+  scale_fill_viridis_c("SWC [% v/v]", direction = -1, option = "plasma") +
   ggtitle("Average SWC by depth across best-fit ensembles")
 ggsave("swc_mean_across_params.top.few.jpeg", plot = swc.top.few, path = file.path("figures", current.folder), height = 8.94, width = 8.94, units='in')
 rm(swc.top.few)
@@ -485,8 +485,8 @@ psi.d.long.sub.mean <- psi.d.long.sub %>%
 # Heatmap 
 psi.top.few <- ggplot(psi.d.long.sub.mean, aes(date, as.factor(-depth), fill = value)) + 
   geom_tile() + ylab("Depth [m]") + xlab("Date") +   
-  #scale_fill_continuous("psi [% v/v]", trans = "reverse")
-  scale_fill_viridis_c("PSI [MPa]", trans = "reverse", option = "plasma") +
+  #scale_fill_continuous("psi [% v/v]", direction = -1)
+  scale_fill_viridis_c("PSI [MPa]", direction = -1, option = "plasma") +
   ggtitle("Average SOILPSI by depth across best-fit ensembles")
 ggsave("psi_mean_across_params.top.few.jpeg", plot = psi.top.few, path = file.path("figures", current.folder), height = 8.94, width = 8.94, units='in')
 rm(psi.top.few)
