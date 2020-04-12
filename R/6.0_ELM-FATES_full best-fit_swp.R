@@ -13,7 +13,13 @@
 rm(list=ls())
 if (!require("pacman")) install.packages("pacman"); library(pacman)
 pacman::p_load(ncdf4, easyNCDF, lubridate, tidyverse, data.table, doParallel, foreach)
-
+# graphics info
+theme_set(theme_bw())
+theme_update(text = element_text(size=14),
+             panel.grid.major = element_blank(),
+             panel.grid.minor = element_blank(),
+             strip.background = element_blank()
+)
 
 current.folder <- "2019-10-14_5000"
 top.few <- 100
@@ -100,7 +106,7 @@ traits.indi <- read.csv("data-raw/hydraulic_traits_panama_kunert.csv") # Nobby's
 tlp <- traits.indi %>% group_by(sp) %>% select(-idividual, -ind_ID) %>%
   summarise(tlp = mean(mean_TLP_Mpa, na.rm = TRUE)) %>% 
   ungroup(sp) 
-tlp.mean <- -mean(tlp$tlp, na.rm = TRUE)
+tlp.mean.positive <- -mean(tlp$tlp, na.rm = TRUE)
 
 ## IN Kuert's tlp data: swp ranges from -1.13 to -2.42 MPa 
 # at -2.42 MPa f(swp) = 0
@@ -109,19 +115,22 @@ tlp.mean <- -mean(tlp$tlp, na.rm = TRUE)
 # f(swp) =  1.260417 - 0.5208333*swp
 ## such that at -2.42 MPa f(swp) = 0
 
-rel.swp.gfac <- data.frame(swp = seq(from = 0, to = tlp.mean, length.out = 100)) %>%
+rel.swp.gfac <- data.frame(swp = seq(from = 0, to = -min(psi$psi), length.out = 1000)) %>%
   mutate(gfac = if_else(swp >=0 & swp < 0.5, 1, 
-                        if_else(swp == 0.5, 1, (tlp.mean - swp)/(tlp.mean - 0.5))))
-jpeg(file.path("figures", current.folder, "Growth_factor_swp_relationship.jpeg"), quality = 100)
-plot(gfac ~ swp, data = rel.swp.gfac, ylab = "Growth Factor", xlab = "Soil Water Potential (-MPa)",
-     main = "SWP - Growth factor Relationship")
+                        if_else(swp > tlp.mean.positive, 0,
+                        if_else(swp == 0.5, 1, (tlp.mean.positive - swp)/(tlp.mean.positive - 0.5)))))
+jpeg(file.path("figures", current.folder, "Growth_factor_swp_relationship.jpeg"), quality = 10, width = 360, height = 240)
+ggplot(rel.swp.gfac, aes(y = gfac, x = swp)) + 
+  geom_point() + scale_x_continuous(breaks = c(0, round(tlp.mean.positive, 1), 5, 10)) +
+  ylab("Growth Factor") + xlab("Soil Water Potential (-MPa)") +
+  ggtitle("SWP - Growth factor Relationship")
 dev.off()
 
-swp.gfac <- psi %>% mutate(psi.2 = -psi) %>%
-  mutate(gfac = if_else(psi.2 >= 0 & psi.2 < 0.5, 1, 
-                         if_else(psi.2 == 0.5, 1, if_else(psi.2 > tlp.mean, 0, 
-                                                          (tlp.mean - psi)/(tlp.mean - 0.5)))))
-head(swp.gfac)
+swp.gfac <- psi %>% mutate(psi.positive = -psi) %>%
+  mutate(gfac = if_else(psi.positive >= 0 & psi.positive < 0.5, 1,
+                         if_else(psi.positive == 0.5, 1, if_else(psi.positive > tlp.mean.positive, 0, 
+                                                          (tlp.mean.positive - psi.positive)/(tlp.mean.positive - 0.5)))))
+head(swp.gfac); range(swp.gfac$swp, na.rm =TRUE)
 write.table(swp.gfac, file = file.path("results", current.folder, "swp.gfac_for_best-fit.txt"), row.names = FALSE)
 
 usethis::use_data(swp.gfac, overwrite = TRUE)
