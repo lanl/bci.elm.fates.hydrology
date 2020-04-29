@@ -1,5 +1,5 @@
 ---
-title: "Workflow.rmd"
+title: "Workflow"
 author: "Rutuja Chitra-Tarak"
 date: "12/2/2019"
 output: html_document
