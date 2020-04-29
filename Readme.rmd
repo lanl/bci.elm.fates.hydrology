@@ -2,7 +2,7 @@
 title: "Workflow"
 author: "Rutuja Chitra-Tarak"
 date: "12/2/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
