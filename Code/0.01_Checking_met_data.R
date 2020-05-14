@@ -161,14 +161,15 @@ raw.dat.yr<- raw.dat %>% subset(!is.na(year) & year != 2019) %>%
   group_by(year) %>%
   summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
 ggplot(raw.dat.yr, aes(x = year, y = rain)) +
-  geom_bar(stat = "identity", )
+  geom_bar(stat = "identity")
 ## 2018 seems really low: checking which months
+## That was before substitution not after
 raw.dat$moyr <- format(raw.dat$datetime, "%y-%m")
 raw.dat.moyr <- raw.dat %>% subset(!is.na(moyr) & year %in% c(2016:2018)) %>%
   group_by(moyr) %>%
   summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
 ggplot(raw.dat.moyr, aes(x = moyr, y = rain)) +
-  geom_bar(stat = "identity", )
+  geom_bar(stat = "identity" )
 View(raw.dat.moyr)
 
 # ###-------------------
