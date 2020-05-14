@@ -199,3 +199,29 @@ swc.df <- swc %>% data.table()
 paw <- swc.df[, ':='(paw = c(swc - swc_wilt))][, swc := NULL]
 rm(swc, swc.df)
 usethis::use_data(paw, overwrite = TRUE)
+
+
+##-----------------------------
+## get best-fit GPP
+##-----------------------------
+load(file.path("data-raw/extract", current.folder, "best-fits/extract/GPP.h1.extract.Rdata"))
+# load(file.path("data-raw/extract", current.folder, "extract/SOILPSI.h1.extract.Rdata"))
+mod.gpp.d <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "date") %>%
+  mutate(date = as.Date(date)) %>%
+  as.data.frame()
+
+rm(var.res.arr) # large file
+
+gpp.d <- mod.gpp.d
+head(gpp.d[, 1:6]); summary(gpp.d[, 1:6])
+gpp.d.long <- gather(gpp.d, key = "n.best.par.sam", "value", -date) %>% 
+  mutate(n.best.par.sam = as.numeric(n.best.par.sam)) %>%
+  left_join(data.frame(n.best.par.sam = 1:top.few, par.sam = params.top.few), 
+            by = "n.best.par.sam") %>%
+  select(-n.best.par.sam)
+gpp <- gpp.d.long %>% subset(date >= as.Date("1990-01-01") & 
+                                   par.sam %in% params.top.few)
+
+write.csv(gpp, file = file.path("results", current.folder, "gpp_model_daily_all_depths_params.top.few_full.csv"), row.names = FALSE)
+
+usethis::use_data(gpp, overwrite = TRUE)
