@@ -65,7 +65,7 @@ Follow Google Doc 4.0_Running ELM-FATES for best-fit parameter (and `code/5.0_Pr
 `data-raw/extract/2019-10-14_5000/best-fits`, 
 
   2. Then extract and save full swp, btran time-series to be used for generating the data package.
-`R/6.0_ELM-FATES_full best-fit_swp.R`
+`code/6.0_ELM-FATES_full best-fit_swp.R`
 
   3. Plot the entire time-series of SWC, SWP and ELM-FATES generated BTRAN for best-fit simulations.
 `code/6.1_Plotting best-fits_full.R`
