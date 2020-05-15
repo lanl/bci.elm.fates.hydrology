@@ -167,8 +167,6 @@ write.csv(swc, file = file.path("results", current.folder, "swc_model_daily_all_
 
 usethis::use_data(swc, overwrite = TRUE)
 
-devtools::document()
-
 ##-------------------------------
 ## Plant available water content 
 ##-------------------------------
@@ -209,6 +207,7 @@ load(file.path("data-raw/extract", current.folder, "best-fits/extract/GPP.h1.ext
 mod.gpp.d <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "date") %>%
   mutate(date = as.Date(date)) %>%
   as.data.frame()
+mod.gpp.d[, -1] <- mod.gpp.d[, -1]*24*60*60 # converting from gC/m^2/s to gC/m^2/d
 
 rm(var.res.arr) # large file
 
@@ -225,3 +224,17 @@ gpp <- gpp.d.long %>% subset(date >= as.Date("1990-01-01") &
 write.csv(gpp, file = file.path("results", current.folder, "gpp_model_daily_all_depths_params.top.few_full.csv"), row.names = FALSE)
 
 usethis::use_data(gpp, overwrite = TRUE)
+devtools::document()
+
+# install.packages("sinew")
+# devtools::install_github("mdlincoln/docthis")
+## To create documentaiton the first time
+# file.create("R/data.R")
+# sinew::makeOxygen(psi)
+# sinew::makeOxygen(btran)
+# sinew::makeOxygen(btran.stat)
+# sinew::makeOxygen(psi.mean)
+# sinew::makeOxygen(swc)
+# sinew::makeOxygen(paw)
+# sinew::makeOxygen(swp.gfac)
+# sinew::makeOxygen(gpp)
