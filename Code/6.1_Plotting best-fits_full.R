@@ -69,7 +69,6 @@ ggsave("psi_mean_across_params.top.few_full.jpeg", plot = plot.psi.mean, path =
          file.path("figures", current.folder, sub.folder), height = 8.94, width = 8.94, units='in')
 
 ## interval summary
-
 psi <- psi %>% 
   mutate(interval.yrs = cut(date, include.lowest = TRUE, breaks = cut.breaks, 
                             labels = cut.labels.2, right = TRUE))
