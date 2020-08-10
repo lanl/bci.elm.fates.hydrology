@@ -533,13 +533,13 @@ g1 <- ggplot(swc.d.long.sub %>%
   ## adding Observed normalised
   geom_line(aes(y = sat, color = "Observed Point Location"), size = 0.5) +
   scale_colour_manual(name = "", values = col1) + ylim(0.18, 0.57) +
-  ylab(expression('Soil Water Content ('*cm^3*cm^-3*')')) +
-  xlab("Time") + 
-  geom_text(data = dat_text.hor, mapping = aes(x = data.backto.steph$date[200], 
-                                           y = 0.57, label = label), 
-            size = 6, vjust = "inward", hjust = "inward") +
+  ylab(expression('Soil Water Content ('*cm^3~cm^-3*')')) +
+  xlab("Time") +
   geom_text(data = dat_text.plot, mapping = aes(x = data.backto.steph$date[200], 
-                                               y = 0.2, label = label),
+                                                y = 0.57, label = label),
+            size = 6, vjust = "inward", hjust = "inward") +
+  geom_text(data = dat_text.hor, mapping = aes(x = data.backto.steph$date[200], 
+                                           y = 0.2, label = label), 
             size = 6, vjust = "inward", hjust = "inward") +
   theme(axis.text = element_text(size = 14, face = "plain"),
         legend.text = element_text(size = 16, face = "plain"),
@@ -585,12 +585,12 @@ p.h.swc.steph.mean.joint <- ggplot(swc.d.long.sub %>%
   scale_colour_manual(name = "", values = col1) + ylim(0.18, 0.57) +
   scale_fill_manual(name = "", values = col1) +
   ylab(expression('Soil Water Content ('*cm^3~cm^-3*')')) +
-  xlab("Time") + 
-  geom_text(data = dat_text.hor, mapping = aes(x = data.backto.steph$date[50], 
-                                               y = 0.57, label = label), 
-            size = 4, vjust = "inward", hjust = "inward") +
+  xlab("Time") +
   geom_text(data = dat_text.plot, mapping = aes(x = data.backto.steph$date[50], 
-                                                y = 0.2, label = label),
+                                                y = 0.57, label = label),
+            size = 4, vjust = "inward", hjust = "inward") +
+  geom_text(data = dat_text.hor, mapping = aes(x = data.backto.steph$date[50], 
+                                               y = 0.2, label = label), 
             size = 4, vjust = "inward", hjust = "inward") +
   theme(axis.text = element_text(size = 14, face = "plain"),
         strip.text.y = element_text(size = 14, face = "plain"),
@@ -649,7 +649,7 @@ p.qrun.m1.joint <- ggplot(qrunoff.m.long %>% subset(date < as.Date("2018-07-01")
   geom_text(aes(x = qrunoff.m.long$date[200], y = 500, label = rmse.qrun.m), 
             size = 4, vjust = "inward", hjust = "inward") +
   theme(legend.text = element_text(size = 16, face = "plain"),
-        legend.position = c(0.4, 0.8), 
+        legend.position = c(0.5, 0.8), 
         legend.key = element_rect(fill = "transparent"),
         legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%Y"))
