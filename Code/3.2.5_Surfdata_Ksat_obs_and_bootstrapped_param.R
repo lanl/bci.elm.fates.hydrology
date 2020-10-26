@@ -51,7 +51,7 @@ p1 <- ggplot(ksat_data, aes(x = depth)) +
         panel.border = element_rect(colour = "black", fill=NA, size=1)
   )
 p1
-ggsave(file.path("figures/Ksat_profiles/Observed Ksat data by depth at Conrad Catchment - Godsey et al 2004.pdf"), 
+ggsave(file.path("figures/Ksat_profiles/Observed Ksat data by depth at Conrad Catchment - Godsey et al 2004.jpeg"), 
        height = 5, width = 5.5, units='in')
 
 ## ksat range required:
@@ -80,9 +80,9 @@ ksat
 # [15] 35.177619934
 p2 <- ggplot(ksat, aes(x = depth)) +
   scale_x_log10() + geom_rug() +
-  ylab("Ksat [mm/s]") + xlab("Depth [m]") +
-  theme(axis.text.y   = element_text(size=14),
-        axis.text.x   = element_text(size=14),
+  ylab(expression("Ksat (mm s"^-1*")")) + xlab("Depth (m)") +
+  theme(axis.text.y   = element_text(size=12),
+        axis.text.x   = element_text(size=12),
         axis.title.y  = element_text(size=14),
         axis.title.x  = element_text(size=14),
         panel.background = element_blank(),
@@ -94,8 +94,8 @@ p2 <- ggplot(ksat, aes(x = depth)) +
 p2 +  geom_ribbon(aes(ymin = ksat_lower, ymax = ksat_upper), fill = "grey70") +
   geom_line(aes(y = ksat_median)) + 
   ggtitle("Beyond Observed Ksat data by depth at Conrad Catchment - Godsey et al 2004")
-ggsave(file.path("figures/Ksat_profiles/Using Observed Ksat data by depth at Conrad Catchment - Godsey et al 2004.pdf"), 
-         height = 5, width = 5.5, units='in')
+ggsave(file.path("figures/Ksat_profiles/Using Observed Ksat data by depth at Conrad Catchment - Godsey et al 2004.jpeg"), 
+         height = 3, width = 3.5, units='in')
 # Generating parameter ensembles
 ## by randomly selecting m and b within the 95% CI range, 
 # however m & b cannot be completely independent, so removing those y = mx+b 
@@ -150,7 +150,7 @@ ggplot(params.accept, aes(x = m, y = b)) +
   geom_point() + theme_classic() + xlab("Slope") + ylab("Intercept") +
   geom_text(aes(x = -0.021, y = 0.018, label = "Intercept = -062*Slope + 9.8e-05"), size = 6) +
   ggtitle("Constrain between slope and intercept for Ksat profiles within 95% CI")
-ggsave(file.path("figures/Ksat_profiles/Constrain between slope and intercept for Ksat profiles within 95CI.pdf"), 
+ggsave(file.path("figures/Ksat_profiles/Constrain between slope and intercept for Ksat profiles within 95CI.jpeg"), 
        height = 5, width = 5.5, units='in')
 
 ## using the constrain between acceptable m and b
@@ -183,11 +183,12 @@ summary(ksat_boot.long.2)
 # 3rd Qu.: 7.830                      3rd Qu.:0.0090461  
 # Max.   :35.180                      Max.   :0.0146341 
 p2 %+% ksat_boot.long.2 +
-  geom_line(aes(y = ksat, group = sample, color = sample), show.legend = FALSE) +
-  ggtitle("Bootstrapped Ksat profiles within observed 95% CI")
-ggsave(file.path("figures/Ksat_profiles/Bootstrapped Ksat profiles within observed 95CI_random_two_hundred.pdf"), 
-       height = 5, width = 5.5, units='in')
-
+  geom_line(aes(y = ksat, group = sample, color = sample), show.legend = FALSE, size = 0.2) #+
+  # ggtitle("Bootstrapped Ksat profiles within observed 95% CI")
+ggsave(file.path("figures/Ksat_profiles/Bootstrapped Ksat profiles within observed 95CI_random_two_hundred.jpeg"), 
+       height = 3, width = 3.5, units='in')
+ggsave(file.path("figures/Ksat_profiles/Bootstrapped Ksat profiles within observed 95CI_random_two_hundred.tiff"), 
+       height = 3, width = 3.5, units='in')
 ### generating only 10 equidistant values of m in the range
 few.samp <- 20
 m.few <- -seq(from = -max(params.accept$m), to = -min(params.accept$m), length.out = few.samp)
@@ -221,5 +222,5 @@ ksat_boot.long.3 <- gather(ksat_boot.3, key = "sample", value = "ksat", -depth)
 p2 %+% ksat_boot.long.3 +
   geom_line(aes(y = ksat, group = sample, color = sample), show.legend = FALSE) +
   ggtitle("Few Bootstrapped Ksat profiles within observed 95% CI")
-ggsave(file.path("figures/Ksat_profiles/Few Bootstrapped Ksat profiles within observed 95CI_random_two_hundred.pdf"), 
+ggsave(file.path("figures/Ksat_profiles/Few Bootstrapped Ksat profiles within observed 95CI_random_two_hundred.jpeg"), 
        height = 5, width = 5.5, units='in')
