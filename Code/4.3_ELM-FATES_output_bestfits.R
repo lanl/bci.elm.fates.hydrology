@@ -1,8 +1,8 @@
-##----------------
-# Choosing Best-fit Simulated ecosystem soil depth for hydrological water-balance
+##******************
+# Choosing Best-fit Simulation ecosystem soil depth for hydrological water-balance
 # Author: Rutuja Chitra-Tarak
 # Date: May 8, 2019
-##-----------------
+##******************
 
 #### Tasks:
 ## Load model outputs for all soil depths: 
@@ -26,7 +26,7 @@ pacman::p_load(smooth, ncdf4, tidyverse, bci.hydromet, data.table, avasoilmoistu
 # QSOIL	Ground evaporation (soil/snow evaporation + soil/snow sublimation - dew)	mm/s
 # QVEGE	canopy evaporation	mm/s
 # QVEGT	canopy transpiration	mm/s
-##--------------------------
+##******************
 ## Setting ggplot theme
 theme_set(theme_bw())
 theme_update(text = element_text(size=14),
@@ -34,26 +34,34 @@ theme_update(text = element_text(size=14),
              panel.grid.minor.y = element_blank(),
              strip.background = element_blank()
 )
-##--------------------------
+##******************
 
 current.folder <- "2019-10-14_5000"
 figures.folder <- paste0(current.folder, "/best-fits")
 top.few <- 100
 params.top.few.cond.df <- read.csv(file.path("results", current.folder, paste0("params.top.few.cond_", top.few, ".csv")), header = TRUE)
 params.top.few <- params.top.few.cond.df$x
-col1 <- c("Observed" = "#f04546", "Observed Gap-filled" = "purple", 
-          "Observed Point Location" = "#f04546", "Observed Plot-wide" = "black",
-          "Observed Point Location2" = "#3591d1", 
-          "Simulated" = "#3591d1", # "Simulated" = "green", 
-          "Best-fit RMSE" = "#3591d1", "Best-fit NSE" = "#3591d1", "Best-fit R-squared" = "purple", 
-          "Observed at Ava-Tower" = "#f04546")
+# col1 <- c("Observation" = "#f04546", "Observation Gap-filled" = "purple", 
+#           "Observation Point Location" = "#f04546", "Observation Plot-wide" = "black",
+#           "Observation Point Location2" = "#3591d1", 
+#           "Simulation" = "#3591d1", # "Simulation" = "green", 
+#           "Best-fit RMSE" = "#3591d1", "Best-fit NSE" = "#3591d1", "Best-fit R-squared" = "purple", 
+#           "Observation at Ava-Tower" = "#f04546")
+col1 <- c("Observation" = "#e91e63", "Observation Gap-filled" = "purple", # #f04546
+          "Observation Point Location" = "#e91e63", "Observation Plot-wide" = "black",
+          "Observation Point Location2" = "#e91e63", 
+          "Simulation" = "gray70",#"#DDADDD", # "Simulation" = "green", 
+          "Best-fit RMSE" = "#e91e63", "Best-fit NSE" = "#e91e63", "Best-fit R-squared" = "purple", 
+          "Observation at Ava-Tower" = "#f04546")
 
 ## for plotting RMSE
 params.obj.top.few.cond <- read.csv(file.path("results", current.folder, paste0("params.obj.top.few.cond_", top.few, ".csv")), header = TRUE)
-
-###
-#### Runoff: Obs versus model #-------
-####
+params.rmse <- read.csv(file = file.path("results", current.folder, "params.rmse.csv"), header = TRUE)
+## original not standardised RMSE
+params.obj.top.few.cond.ori <- params.rmse %>% subset(par.sam %in% params.top.few)
+###***************************
+#### Runoff: Obs versus model -------
+###***************************
 # Daily #------
 ####
 ## QRUNOFF total liquid runoff (does not include QSNWCPICE)
@@ -78,16 +86,16 @@ qrunoff.d.long <- gather(qrunoff.d.sub, key = "par.sam", "value", -date, -obs) %
 
 p.qrun.d.1 <- ggplot(qrunoff.d.long,
        aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.05) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.05) +
   scale_colour_manual(name = "", values = col1) +
-  geom_line(aes(y = obs, colour = "Observed"), size = 0.5) +
+  geom_line(aes(y = obs, colour = "Observation"), size = 0.5) +
   ylab(expression("Stream Discharge (mm."*day^-1*")")) +
   xlab("Time") + 
   theme(legend.text = element_text(size = 16, face = "plain"),
         legend.position = c(0.7, 0.95), 
         legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%b%y")) #+
- # ggtitle("QRUNOFF: Observed vs Simulated_Daily")
+ # ggtitle("QRUNOFF: Observation vs Simulation_Daily")
 ggsave("QRUNOFF_Obs_vs_model_daily.jpeg", plot = p.qrun.d.1, path = 
          file.path("figures", figures.folder), device = "jpeg", height = 4.5, width = 6, units='in')
 
@@ -106,32 +114,34 @@ qrunoff.m.long <- qrunoff.d.long %>%
   as.data.frame()
 
 ## rsq for the ensemble with best rmse
-rmse.qrun.m <- round(mean(1 - params.obj.top.few.cond$qrunoff_monthly), 2)
+# 
+# rmse.qrun.m <- paste("RMSE* = ", round(mean(1 - params.obj.top.few.cond$qrunoff_monthly), 2))
+rmse.qrun.m <- paste("bar(RMSE) == ", round(mean(params.obj.top.few.cond.ori$qrunoff_monthly, na.rm = TRUE), 2))
 
 qrunoff.m.long <- qrunoff.m.long %>% 
   mutate(date = as.Date(paste0(yrmo, "-01")))
 p.qrun.m1 <- ggplot(qrunoff.m.long,
        aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(x= date, y = obs, color = "Observed"), size = 0.7) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(x= date, y = obs, color = "Observation"), size = 0.7) +
   scale_colour_manual(name = "", values = col1) +
   ylab(expression("Stream Discharge (mm."*month^-1*")")) +
   xlab("Time") + 
-  geom_text(aes(x = qrunoff.m.long$date[300], y = 500, label = rmse.qrun.m), 
-            size = 6, vjust = "inward", hjust = "inward") +
+  geom_text(data = data.frame(), aes(x = qrunoff.m.long$date[700], y = 450, label = rmse.qrun.m), parse = TRUE,
+            size = 6, vjust = "inward", hjust = "inward", inherit.aes = FALSE) +
   theme(legend.text = element_text(size = 16, face = "plain"),
         legend.position = c(0.3, 0.9), 
         legend.key = element_rect(fill = "transparent"),
         legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%b%y")) #+
-  # ggtitle("QRUNOFF: Observed vs Simulated_Monthly")
+  # ggtitle("QRUNOFF: Observation vs Simulation_Monthly")
 ggsave("QRUNOFF_Obs_vs_model_monthly.jpeg", plot = p.qrun.m1, path = 
          file.path("figures", figures.folder), device = "jpeg", height = 4.5, width = 6, units='in')
 
-#--------------
-####
+
+###***************************
 #### Evapotranspiration: Obs versus model #-------
-####
+###***************************
 # Daily #------
 ####
 load(file.path("data-raw/extract", current.folder, "extract/QVEGE.h1.extract.Rdata"))
@@ -145,7 +155,7 @@ rm(var.res.arr) # large file
 flow.columns <- (mod.qvege.d[, -1] + mod.qvegt.d[, -1] + mod.qsoil.d[, -1])*24*60*60 # from mm/s to mm/day
 mod.qet.d <-  cbind.data.frame(mod.qvege.d[, 1], flow.columns) %>% 
   mutate(date = as.Date(date))
-## Observed ET from flux tower
+## Observation ET from flux tower
 # AET.flag.day has NAs substituted where insufficient (< 50%) actual data for the day
 obs.qet.d <- bci.hydromet::forcings %>% select(date, AET, AET.flag.day) %>% # in mm/day
   rename(obs = AET.flag.day, 
@@ -154,7 +164,7 @@ obs.qet.d <- bci.hydromet::forcings %>% select(date, AET, AET.flag.day) %>% # in
 head(obs.qet.d)
 # joining obs with mod
 qet.d <- obs.qet.d %>% full_join(mod.qet.d, by = "date") 
-# does not have to be done for ET because observed ET is 3.5 years ahead of the run start date, which is 2008-01-1
+# does not have to be done for ET because Observation ET is 3.5 years ahead of the run start date, which is 2008-01-1
 qet.d.sub <- qet.d %>% subset(date >= c(min(mod.qet.d$date, na.rm = TRUE) + 365*4 + 1))
 qet.d.long <- gather(qet.d.sub, key = "par.sam", "value", -date, -obs, -obs.2) %>% 
   subset(par.sam %in% params.top.few)
@@ -165,7 +175,7 @@ qet.d.long.sub <- qet.d.long
 
 p.et1 <- ggplot(qet.d.long.sub,
                 aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.1) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.1) +
   scale_colour_manual(name = "", values = col1) +
   ylab(expression("Evapotranspiration (mm."*day^-1*")")) +
   xlab("Time") + 
@@ -176,25 +186,25 @@ p.et1 <- ggplot(qet.d.long.sub,
         legend.position = c(0.75, 0.95), legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%b%y")) 
 p.et1.a.d <- p.et1 + 
-  geom_line(aes(x= date, y = obs.2, color = "Observed"), size = 0.5) #+ 
-  # ggtitle("Evapotranspiration: Observed vs Simulated_Daily")
+  geom_line(aes(x= date, y = obs.2, color = "Observation"), size = 0.5) #+ 
+  # ggtitle("Evapotranspiration: Observation vs Simulation_Daily")
 ggsave("ET_Obs_vs_model_daily_all_years.jpeg", plot = p.et1.a.d, 
        path = file.path("figures", figures.folder), device = "jpeg", height = 4.5, width = 6, units='in')
 p.et1.b.d <- p.et1 + 
-  geom_line(aes(x= date, y = obs, color = "Observed"), size = 0.5) #+ 
-  # ggtitle("Evapotranspiration: Observed vs Simulated_Daily")
+  geom_line(aes(x= date, y = obs, color = "Observation"), size = 0.5) #+ 
+  # ggtitle("Evapotranspiration: Observation vs Simulation_Daily")
 ggsave("ET_Obs_vs_model_daily_all_years_with_gaps.jpeg", plot = p.et1.b.d, 
        path = file.path("figures", figures.folder), device = "jpeg", height = 4.5, width = 6, units='in')
-######
+###***************************
 ##### lines and points format
-######
+###***************************
 
-col2 <- c("Observed" = "#f04546", "Observed Gap-filled" = "purple", "Simulated" = "#3591d1")
+col2 <- c("Observation" = "#f04546", "Observation Gap-filled" = "purple", "Simulation" = "#3591d1")
 p.et1.p <- p.et1 +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(x= date, y = obs.2, color = "Observed"), size = 0.2, linetype = 5) +  
-  geom_point(aes(x= date, y = obs.3, color = "Observed Gap-filled"), size = 1, shape = 1) +  
-  geom_point(aes(x= date, y = obs, color = "Observed"), size = 1, shape = 1) +  
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(x= date, y = obs.2, color = "Observation"), size = 0.2, linetype = 5) +  
+  geom_point(aes(x= date, y = obs.3, color = "Observation Gap-filled"), size = 1, shape = 1) +  
+  geom_point(aes(x= date, y = obs, color = "Observation"), size = 1, shape = 1) +  
   theme(legend.position = "top") +
   scale_colour_manual(name = "", values = col2)
 ggsave(paste0("ET_Obs_vs_model_daily_all_years_points_lines.jpeg"), plot = p.et1.p, 
@@ -228,16 +238,18 @@ qet.m <- qet.m.long %>%
 
 qet.m.long.sub <- qet.m.long %>% mutate(date = as.Date(paste0(yrmo, "-01")))
 
-rmse.qet.m <- round(mean(1 - params.obj.top.few.cond$qet_monthly), 2)
+# rmse.qet.m <- paste0("RMSE* = ", round(mean(1 - params.obj.top.few.cond$qet_monthly), 2))
+rmse.qet.m <- paste("bar(RMSE) == ", round(mean(params.obj.top.few.cond.ori$qet_monthly, na.rm = TRUE), 2))
 
 # rmse.label <- as.character(as.expression(italic(r)^2~"="~rmse.max))
 p.et.m1 <- ggplot(qet.m.long.sub, aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(x= date, y = obs, color = "Observed"), size = 0.7) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(x= date, y = obs, color = "Observation"), size = 0.7) +
   scale_colour_manual(name = "", values = col1) +
   ylab(expression("Evapotranspiration (mm."*month^-1*")")) +
   xlab("Time") +
-  geom_text(aes(x = qet.m.long.sub$date[300], y = 130, label = rmse.qet.m), 
+  geom_text(data = data.frame(), parse = TRUE, inherit.aes = FALSE, 
+            aes(x = qet.m.long.sub$date[300], y = 130, label = rmse.qet.m), 
             size = 6, vjust = "inward", hjust = "inward") +
   theme(axis.text = element_text(size = 14, face = "plain"),
         legend.text = element_text(size = 16, face = "plain"),
@@ -245,13 +257,13 @@ p.et.m1 <- ggplot(qet.m.long.sub, aes(x = date, y = value)) +
         legend.key = element_rect(fill = "transparent"),
         legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%b%y")) #+
-  # ggtitle("Evapotranspiration: Observed vs Simulated_Monthly")
+  # ggtitle("Evapotranspiration: Observation vs Simulation_Monthly")
 ggsave("ET_Obs_vs_model_monthly.jpeg", plot = p.et.m1, path = 
          file.path("figures", figures.folder), device = "jpeg", height = 4.5, width = 6, units='in')
 
-###
+###***************************
 #### GPP: Obs versus model #-------
-####
+###***************************
 # Daily #------
 ####
 load(file.path("data-raw/extract", current.folder, "extract/GPP.h1.extract.Rdata"))
@@ -275,7 +287,8 @@ obs.gpp.d <- bci.tower %>% select(datetime, gpp) %>% # in mumol/m2/2: units must
   group_by(date) %>% summarise(obs = mean(gpp.mumol, na.rm = T)) %>%
   mutate(obs = obs*12*1e-06*24*60*60) %>% # gC/m2/d %>%
   subset(date != is.na(date))
-# mutate(obs = as.numeric(bigleaf::umolCO2.to.gC(obs))) ## gives the same result #-------
+
+# mutate(obs = as.numeric(bigleaf::umolCO2.to.gC(obs))) ## gives the same result 
 # gC/m^2/d
 # to convert mumol/m2/s to gC/m^2/d
 # Cmol*mumol2mol*kg2g/days2seconds 
@@ -283,7 +296,7 @@ obs.gpp.d <- bci.tower %>% select(datetime, gpp) %>% # in mumol/m2/2: units must
 # umol2mol - conversion micromole (umol) to mol (mol) 
 # kg2g - conversion kilogram (kg) to gram (g) 
 # days2seconds - seconds per day
-# mean gpp.mumol = 10696 in mumol/m2/s #----
+# mean gpp.mumol = 10696 in mumol/m2/s
 # so mean gpp in gC/m^2/d
 # conversion.eq : 
 summary(obs.gpp.d)
@@ -297,21 +310,20 @@ gpp.d.long.sub <- gpp.d.long %>% subset(date >= min(obs.gpp.d$date) & date < max
 
 p.gpp.d1 <- ggplot(gpp.d.long.sub,
        aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.1) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.1) +
   scale_colour_manual(name = "", values = col1) +
-  geom_line(aes(y = obs, colour = "Observed"), size = 0.5) +
+  geom_line(aes(y = obs, colour = "Observation"), size = 0.5) +
   ylab("GPP [gC/m^2/d]") +
   xlab("Date") + 
   theme(axis.text = element_text(size = 14, face = "plain"),
         legend.text = element_text(size = 16, face = "plain"),
         legend.position = c(0.8, 0.9), legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%b%y")) +
-  ggtitle("GPP: Observed vs Simulated_Daily")
+  ggtitle("GPP: Observation vs Simulation_Daily")
 ggsave( "GPP_Obs_vs_model_daily.jpeg", plot = p.gpp.d1, path = file.path("figures", figures.folder), device = "jpeg", height = 6.25, width = 8.94, units='in')
 
-######
 ##### lines and points format
-######
+
 
 p.gpp1 <- ggplot(gpp.d.long.sub, aes(x = date, y = value)) +
   ylab("GPP [gC/m^2/d]") +
@@ -323,9 +335,9 @@ p.gpp1 <- ggplot(gpp.d.long.sub, aes(x = date, y = value)) +
         legend.position = c(0.8, 0.9), legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%b%y")) 
 p.gpp1.p <- p.gpp1 +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(x= date, y = obs, color = "Observed"), size = 0.2, linetype = 5) +  
-  geom_point(aes(x= date, y = obs, color = "Observed"), size = 1, shape = 1) +  
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(x= date, y = obs, color = "Observation"), size = 0.2, linetype = 5) +  
+  geom_point(aes(x= date, y = obs, color = "Observation"), size = 1, shape = 1) +  
   theme(legend.position = "top") +
   scale_colour_manual(name = "", values = col2)
 ggsave(paste0("GPP_Obs_vs_model_daily_all_years_points_lines.jpeg"), plot = p.gpp1.p, path = file.path("figures", figures.folder), device = "jpeg", height = 3, width = 15, units='in')
@@ -349,8 +361,8 @@ gpp.m.long <- gpp.d.long %>%
 gpp.m.long <- gpp.m.long %>% mutate(date = as.Date(paste0(yrmo, "-01")))
 p.gpp.m.1 <- ggplot(gpp.m.long,
        aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(x= date, y = obs, color = "Observed"), size = 0.7) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(x= date, y = obs, color = "Observation"), size = 0.7) +
   scale_colour_manual(name = "", values = col1) +
   ylab("GPP [gC/m^2/d]") +
   xlab("Date") + 
@@ -358,14 +370,13 @@ p.gpp.m.1 <- ggplot(gpp.m.long,
         legend.text = element_text(size = 16, face = "plain"),
         legend.position = c(0.8, 0.9), legend.background = element_rect(fill = "transparent")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%b%y")) +
-  ggtitle("GPP: Observed vs Simulated_Monthly")
+  ggtitle("GPP: Observation vs Simulation_Monthly")
 ggsave("GPP_Obs_vs_model_monthly.jpeg", plot = p.gpp.m.1, path = file.path("figures", figures.folder), device = "jpeg", height = 6.25, width = 8.94, units='in')
 
-##
-#--------------
-####
+
+###***************************
 #### Soil Moisture: Obs versus model #-------
-####
+###***************************
 # Daily #------
 # bci.hydromet::TDR
 # bci.hydromet::sm.historic
@@ -404,7 +415,9 @@ for(i in 1: length(var.res.arr)){
 }
 rm(mod.swc.i, var.res.arr) # large file
 
-### adding stephan Kupers data: #-------
+###***************************
+### adding stephan Kupers data: 
+###***************************
 swp.df <- read.table(
   file.path("data-raw/Kupers_et_al/Input/BCI_Soil_moisture_mapping.txt"),
   na.strings = c("NA", ""),
@@ -425,7 +438,7 @@ swp.df <- swp.df[!is.na(swp.df$depth),]
 steph.sm <- swp.df %>%
   select(date, depth, swc) %>% 
   mutate(date = as.Date(date, format = "%m/%d/%Y"),
-         data = "Observed Plot-wide",
+         data = "Observation Plot-wide",
          depth = as.numeric(as.character(depth)),
          ## swc data is gravimetric. Need to be volumetric to comapre with model
          ## with 0.8 g/cm^3 bulk dry density at 15 cm depth. Data by Matteo: data/rawHydrological model Barro Colorado Island.docx
@@ -446,7 +459,7 @@ steph.quant <- steph.sm %>%
             q.75 = quantile(swc, na.rm = TRUE, probs = c(0.75))) %>%
   ungroup(depth, mean.date)
 
-####-----
+####******
 swc.vertical <- avasoilmoisture::vertical %>% rename(obs = swc) %>% 
   group_by(date, depth) %>% summarise(obs = mean(obs, na.rm = TRUE)) %>% 
   mutate(date.depth = paste0(date, ".", depth))
@@ -519,38 +532,47 @@ steph.quant <- steph.quant %>%
                                 levels = c("0.1 m", "0.4 m", "1 m"), ordered = TRUE))
 
 
-label.depths.hor <- round(1 - c(mean(params.obj.top.few.cond$sat10_daily), mean(params.obj.top.few.cond$sat40_daily),
-                                            mean(params.obj.top.few.cond$sat100_daily)), 2)
+# label.depths.hor <- paste0("RMSE* = ", round(1 - c(mean(params.obj.top.few.cond$sat10_daily), mean(params.obj.top.few.cond$sat40_daily),
+#                                             mean(params.obj.top.few.cond$sat100_daily)), 2))
+label.depths.hor <- paste0("bar(RMSE) == ", round(c(mean(params.obj.top.few.cond.ori$sat10_daily, na.rm = TRUE), mean(params.obj.top.few.cond.ori$sat40_daily, na.rm = TRUE),
+                                                   mean(params.obj.top.few.cond.ori$sat100_daily, na.rm = TRUE)), 2))
 dat_text.hor <- data.frame(label = label.depths.hor, depth.plot = c("0.1 m", "0.4 m", "1 m"))
  
-label.depths.plot <- round(1 - c(mean(params.obj.top.few.cond$swcplot10_daily), mean(params.obj.top.few.cond$swcplot40_daily),
-                                                 mean(params.obj.top.few.cond$swcplot100_daily)), 2)
+# label.depths.plot <- paste0("RMSE* = ", round(1 - c(mean(params.obj.top.few.cond$swcplot10_daily), mean(params.obj.top.few.cond$swcplot40_daily),
+#                                                  mean(params.obj.top.few.cond$swcplot100_daily)), 2))
+label.depths.plot <- paste0("bar(RMSE) == ", round(c(mean(params.obj.top.few.cond.ori$swcplot10_daily, na.rm = TRUE), mean(params.obj.top.few.cond.ori$swcplot40_daily, na.rm = TRUE),
+                                                    mean(params.obj.top.few.cond.ori$swcplot100_daily, na.rm = TRUE)), 2))
+
 dat_text.plot <- data.frame(label = label.depths.plot, depth.plot = c("0.1 m", "0.4 m", "1 m"))
+
+panel_text.plot <- data.frame(label = c("0.1~m", "0.4~m", "1~m"), depth.plot = c("0.1 m", "0.4 m", "1 m"))
 
 g1 <- ggplot(swc.d.long.sub %>% 
                subset(par.sam == params.top.few[1] & depth %in% c(10, 40, 100)), aes(x = date)) +
-  geom_line(data = data.backto.steph, aes(y = value, group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  ## adding Observed normalised
-  geom_line(aes(y = sat, color = "Observed Point Location"), size = 0.5) +
+  geom_line(data = data.backto.steph, aes(y = value, group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  ## adding Observation normalised
+  geom_line(aes(y = sat, color = "Observation Point Location"), size = 0.5) +
   scale_colour_manual(name = "", values = col1) + ylim(0.18, 0.57) +
   ylab(expression('Soil Water Content ('*cm^3~cm^-3*')')) +
   xlab("Time") +
-  geom_text(data = dat_text.plot, mapping = aes(x = data.backto.steph$date[200], 
+  geom_text(data = dat_text.plot, parse = TRUE, inherit.aes = FALSE,
+            mapping = aes(x = data.backto.steph$date[200], 
                                                 y = 0.57, label = label),
-            size = 6, vjust = "inward", hjust = "inward") +
-  geom_text(data = dat_text.hor, mapping = aes(x = data.backto.steph$date[200], 
+            size = 3, vjust = "inward", hjust = "inward") +
+  geom_text(data = dat_text.hor, parse = TRUE, inherit.aes = FALSE, 
+            mapping = aes(x = data.backto.steph$date[200], 
                                            y = 0.2, label = label), 
-            size = 6, vjust = "inward", hjust = "inward") +
+            size = 3, vjust = "inward", hjust = "inward") +
   theme(axis.text = element_text(size = 14, face = "plain"),
         legend.text = element_text(size = 16, face = "plain"),
         legend.background = element_rect(fill = "transparent")) #+
-  #ggtitle("Soil Water Content: Observed vs Ensemble simulations by depth")
+  #ggtitle("Soil Water Content: Observation vs Ensemble simulations by depth")
 p.h.swc.steph <- g1 + facet_grid(depth.plot ~ .) + 
   theme(legend.position = "top")
 p.h.swc.steph.mean <- p.h.swc.steph +
-  geom_point(data = steph.quant, aes(x = mean.date, y = mean, color = "Observed Plot-wide"),
+  geom_point(data = steph.quant, aes(x = mean.date, y = mean, color = "Observation Plot-wide"),
              shape = 21, color = "white", fill = "black", alpha = 0.9, size = 1) +
-  geom_errorbar(data = steph.quant, aes(x = mean.date, ymin = lower, ymax = upper, color = "Observed Plot-wide"), width = 0.1) +
+  geom_errorbar(data = steph.quant, aes(x = mean.date, ymin = lower, ymax = upper, color = "Observation Plot-wide"), width = 0.1) +
   theme(axis.text.x = element_text(face = "plain", angle = 90, vjust = 1, hjust = 1)) +
   scale_x_date(date_breaks = "6 months", labels = function(x) format(x, "%b%y")) 
 ggsave("swc_Obs_vs_model_daily_horizontal_with_steph_mean.jpeg", plot = p.h.swc.steph.mean, 
@@ -558,18 +580,19 @@ ggsave("swc_Obs_vs_model_daily_horizontal_with_steph_mean.jpeg", plot = p.h.swc.
 
 ### 
 ## With vertical:
-rmse.v.swc.d <- round(mean(1 - params.obj.top.few.cond$swc.vert_daily), 2)
-  
+# rmse.v.swc.d <- paste0("RMSE* = ", round(mean(1 - params.obj.top.few.cond$swc.vert_daily), 2))
+rmse.v.swc.d <- paste("bar(RMSE) == ", round(mean(params.obj.top.few.cond.ori$swc.vert_daily, na.rm = TRUE), 2))
 p.v.swc <- ggplot(swc.d.vert.long.sub, aes(x = date)) +
-  geom_line(aes(y = value, group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  ## adding Observed normalised
-  geom_line(aes(y = obs, color = "Observed Point Location"), size = 0.4) +
+  geom_line(aes(y = value, group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  ## adding Observation normalised
+  geom_line(aes(y = obs, color = "Observation Point Location"), size = 0.4) +
   scale_colour_manual(name = "", values = col1) + 
-  ylab(expression('Soil Water Content ('*cm^3*cm^-3*')')) +
+  ylab(expression('Soil Water Content ('*cm^3~cm^-3*')')) +
   xlab("Time") + 
-  geom_text(aes(x = swc.d.vert.long.sub$date[200], y = 0.57, label = rmse.v.swc.d), 
-            size = 6, vjust = "inward", hjust = "inward") +
-  # ggtitle("Soil Water Content: Observed vs Ensemble simulations by depth") +
+  geom_text(data = data.frame(), parse = TRUE, inherit.aes = FALSE, 
+            aes(x = swc.d.vert.long.sub$date[200], y = 0.57, label = rmse.v.swc.d), 
+            size = 3, vjust = "inward", hjust = "inward") +
+  # ggtitle("Soil Water Content: Observation vs Ensemble simulations by depth") +
   theme(legend.justification = c(1, 1),  legend.position = c(0.85, 0.95), legend.direction = "horizontal",
         legend.key = element_rect(fill = "transparent"),
         legend.background = element_rect(fill = "transparent"))
@@ -580,98 +603,123 @@ ggsave("swc_Obs_vs_model_daily_vertical.jpeg", plot = p.v.swc, path =
 
 p.h.swc.steph.mean.joint <- ggplot(swc.d.long.sub %>% 
                subset(par.sam == params.top.few[1] & depth %in% c(10, 40, 100)), aes(x = date)) +
-  geom_line(data = data.backto.steph, aes(y = value, group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(y = sat, color = "Observed"), size = 0.5) +
+  geom_line(data = data.backto.steph, aes(y = value, group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(y = sat, color = "Observation"), size = 0.5) +
   scale_colour_manual(name = "", values = col1) + ylim(0.18, 0.57) +
   scale_fill_manual(name = "", values = col1) +
-  ylab(expression('Soil Water Content ('*cm^3~cm^-3*')')) +
+  ylab(expression('VWC ('*cm^3~cm^-3*')')) +
   xlab("Time") +
-  geom_text(data = dat_text.plot, mapping = aes(x = data.backto.steph$date[50], 
+  geom_text(data = panel_text.plot, parse = TRUE, inherit.aes = FALSE,
+            mapping = aes(x = data.backto.steph$date[length(data.backto.steph$date) - 50], 
                                                 y = 0.57, label = label),
-            size = 4, vjust = "inward", hjust = "inward") +
-  geom_text(data = dat_text.hor, mapping = aes(x = data.backto.steph$date[50], 
-                                               y = 0.2, label = label), 
-            size = 4, vjust = "inward", hjust = "inward") +
+            size = 6, vjust = "inward", hjust = "inward") +
+  geom_text(data = dat_text.plot, parse = TRUE, inherit.aes = FALSE,
+            mapping = aes(x = data.backto.steph$date[10], 
+                                                y = 0.57, label = label),
+            size = 4.5, vjust = "inward", hjust = "inward") +
+  geom_text(data = dat_text.hor, parse = TRUE, inherit.aes = FALSE,
+            mapping = aes(x = data.backto.steph$date[10], 
+                                               y = 0.18, label = label), 
+            size = 4.5, vjust = "inward", hjust = "inward") +
   theme(axis.text = element_text(size = 14, face = "plain"),
-        strip.text.y = element_text(size = 14, face = "plain"),
+        strip.text.y = element_blank(),
         legend.text = element_text(size = 16, face = "plain"),
         legend.background = element_rect(fill = "transparent")) +
   facet_grid(depth.plot ~ .) + 
-  theme(legend.position = "top") +
   geom_errorbar(data = steph.quant, aes(x = mean.date, ymin = lower, ymax = upper), 
-                color = "black", width = 0.2) +
+                color = "black", width = 0.1) +
   geom_point(data = steph.quant, aes(x = mean.date, y = mean, 
-                                     fill = "Observed"),
+                                     fill = "Observation"),
              shape = 21, color = "black", alpha = 1, size = 2) +
   # theme(axis.text.x = element_text(face = "plain", angle = 90, vjust = 1, hjust = 1)) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%Y")) +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12, face = "bold"))
 
 swc.d.vert.long.sub <- swc.d.vert.long.sub %>% mutate(depth.plot = "0-0.15 m")
+panel_text.plot.v <- data.frame(label = "0-0.15~m", depth.plot = "0-0.15 m")
+
 p.v.swc.joint <- ggplot(swc.d.vert.long.sub, aes(x = date)) +
-  geom_line(aes(y = value, group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  ## adding Observed normalised
-  geom_line(aes(y = obs, color = "Observed"), size = 0.4) +
+  geom_line(aes(y = value, group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  ## adding Observation normalised
+  geom_line(aes(y = obs, color = "Observation"), size = 0.4) +
   scale_colour_manual(name = "", values = col1) + 
-  ylab(expression('VWC ('*cm^3/cm^3*')')) +
+  ylab(expression('VWC ('*cm^3~cm^-3*')')) +
   xlab("Time") + 
-  geom_text(aes(x = swc.d.vert.long.sub$date[200], y = 0.57, label = rmse.v.swc.d), 
-            size = 4, vjust = "inward", hjust = "inward") +
+  geom_text(data = panel_text.plot.v, parse = TRUE, inherit.aes = FALSE,
+            mapping = aes(x = swc.d.vert.long.sub$date[length(swc.d.vert.long.sub$date) - 50], 
+                                                  y = 0.57, label = label),
+            size = 6, vjust = "inward", hjust = "inward") +
+  geom_text(data = data.frame(), parse = TRUE, inherit.aes = FALSE,
+            aes(x = swc.d.vert.long.sub$date[100], y = 0.57, label = rmse.v.swc.d), 
+            size = 4.2, vjust = "inward", hjust = "inward") +
   theme(legend.position = "none") +
   facet_grid(depth.plot ~ .) + 
   theme(axis.text = element_text(size = 14, face = "plain"),
-        strip.text.y = element_text(size = 14, face = "plain")) +
+        axis.title = element_text(size = 12, face = "bold"),
+        strip.text.y = element_blank()) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%Y"))
 
 p.et.m1.joint <- ggplot(qet.m.long.sub, aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(x= date, y = obs, color = "Observed"), size = 0.7) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(x= date, y = obs, color = "Observation"), size = 0.7) +
   scale_colour_manual(name = "", values = col1) +
   ylab("Evapotranspiration (mm/month)") +
   xlab("Time") + 
-  geom_text(aes(x = qet.m.long.sub$date[200], y = 130, label = rmse.qet.m), 
-            size = 4, vjust = "inward", hjust = "inward") +
+  geom_text(data = data.frame(), parse = TRUE, inherit.aes = FALSE, 
+            aes(x = qet.m.long.sub$date[100], y = 150, label = rmse.qet.m), 
+            size = 4.2, vjust = "inward", hjust = "inward") +
   theme(axis.text = element_text(size = 14, face = "plain"),
-        legend.text = element_text(size = 16, face = "plain"),
-        legend.position = c(0.25, 0.95), 
-        legend.key = element_rect(fill = "transparent"),
-        legend.background = element_rect(fill = "transparent")) +
+        axis.title = element_text(size = 12, face = "bold")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%Y")) +
   theme(legend.position = "none")
 
 p.qrun.m1.joint <- ggplot(qrunoff.m.long %>% subset(date < as.Date("2018-07-01")),
                           aes(x = date, y = value)) +
-  geom_line(aes(group = par.sam, color = "Simulated"), show.legend = F, size = 0.2) +
-  geom_line(aes(x= date, y = obs, color = "Observed"), size = 0.7) +
+  geom_line(aes(group = par.sam, color = "Simulation"), show.legend = F, size = 0.2) +
+  geom_line(aes(x= date, y = obs, color = "Observation"), size = 0.7) +
   scale_colour_manual(name = "", values = col1) +
   ylab("Stream Discharge (mm/month)") +
   xlab("Time") + 
-  geom_text(aes(x = qrunoff.m.long$date[200], y = 500, label = rmse.qrun.m), 
-            size = 4, vjust = "inward", hjust = "inward") +
+  geom_text(data = data.frame(), parse = TRUE, inherit.aes = FALSE,
+            aes(x = qrunoff.m.long$date[100], y = 550, label = rmse.qrun.m), 
+            size = 4.2, vjust = "inward", hjust = "inward") +
   theme(legend.text = element_text(size = 16, face = "plain"),
-        legend.position = c(0.5, 0.8), 
+        legend.position = "none", #c(0.5, 0.65) 
         legend.key = element_rect(fill = "transparent"),
-        legend.background = element_rect(fill = "transparent")) +
+        legend.background = element_rect(fill = "transparent"),
+        axis.title = element_text(size = 12, face = "bold")) +
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%Y"))
 
-right_col <- cowplot::plot_grid(p.qrun.m1.joint, p.et.m1.joint, labels = c('B', 'C'), 
+right_col <- cowplot::plot_grid(p.qrun.m1.joint, p.et.m1.joint, labels = c('b', 'c'), 
                                 label_size = 14, nrow = 2, #label_x = 0, label_y = 0,
                                 hjust = 1) #vjust = -0.5
-joint.plot <- cowplot::plot_grid(p.h.swc.steph.mean.joint, right_col, labels = c('A', ''), 
+joint.plot <- cowplot::plot_grid(p.h.swc.steph.mean.joint, right_col, labels = c('a', ''), 
                                  label_size = 14, ncol = 2, rel_widths = c(1, 1.2))
 ggsave("hydro-calib.jpeg", plot = joint.plot, path = 
          file.path("figures", figures.folder), device = "jpeg", height = 6, width = 9, units ='in')
 
-p.et.m1.joint.shortlab <-  p.et.m1.joint + ylab(expression("ET (mm month"^-1*")"))
-p.qrun.m1.joint.shortlab <-  p.qrun.m1.joint + ylab(expression("Discharge (mm month"^-1*")"))
-p.h.swc.steph.mean.joint.shortlab <- p.h.swc.steph.mean.joint +  ylab(expression('VWC ('*cm^3~cm^-3*')'))
+p.et.m1.joint.shortlab <-  p.et.m1.joint + ylab("ET") 
+p.qrun.m1.joint.shortlab <-  p.qrun.m1.joint + ylab("Discharge") + xlab(NULL)
+p.v.swc.joint.shortlab <- p.v.swc.joint + ylab("VWC") + xlab(NULL)
+p.h.swc.steph.mean.joint.shortlab <- p.h.swc.steph.mean.joint + ylab("VWC") + xlab(NULL)
 
-right_col2 <- cowplot::plot_grid(p.v.swc.joint, p.qrun.m1.joint.shortlab, 
+right_col2 <- cowplot::plot_grid(p.v.swc.joint.shortlab, p.qrun.m1.joint.shortlab, 
                                  p.et.m1.joint.shortlab, 
-                                                labels = c('B', 'C', 'D'), 
+                                                labels = c('b', 'c', 'd'), 
                                 label_size = 14, nrow = 3, #label_x = 0, label_y = 0,
-                                hjust = 1) #vjust = -0.5
-joint.plot2 <- cowplot::plot_grid(p.h.swc.steph.mean.joint.shortlab, right_col2, labels = c('A', ''), 
+                                hjust = -2.5) #vjust = -0.5
+joint.plot2 <- cowplot::plot_grid(p.h.swc.steph.mean.joint.shortlab, right_col2, labels = c('a', ''), 
                                  label_size = 14, ncol = 2, rel_widths = c(1, 1))
-ggsave("hydro-calib2.jpeg", plot = joint.plot2, path = 
+legend <- cowplot::get_legend(
+  p.qrun.m1.joint.shortlab + 
+    guides(color = guide_legend(nrow = 1, override.aes = list(size = 3))) +
+    theme(legend.position = "top", 
+          legend.text = element_text(size = 16, face = "plain")))
+
+pmat.2 <- cowplot::plot_grid(legend, joint.plot2, ncol = 1, rel_heights = c(0.1, 1))
+ggsave("hydro-calib2.jpeg", plot = pmat.2, path = 
          file.path("figures", figures.folder), device = "jpeg", height = 6, width = 9, units ='in')
+ggsave("hydro-calib2.tiff", plot = pmat.2, path = 
+         file.path("figures", figures.folder), device = "tiff", height = 6, width = 9, units ='in')
+
