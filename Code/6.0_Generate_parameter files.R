@@ -491,3 +491,41 @@ zip(zipfile = "surf.sam.zip", files = file.path(surf.dir, f.to.zip.3))
 #   
   
 # Evergreen species leaf longevity > 12 months Sobrado
+
+
+
+#### R code to create soil_depth_arr & fmax_arr:
+# depth <- rep(3:10, each = 5)
+# fmax <- rep(c(0.2, 0.3, 0.4, 0.5, 0.6), times = 8)
+# paste(depth, collapse = ",")
+# paste(fmax, collapse = ",")
+
+
+# #### On server:
+# cd $CASE_ROOT/BCI/bci_0.1x0.1_v4.0i/
+#   
+#   set soil_depth_arr={3,3,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,6,7,7,7,7,7,8,8,8,8,8,9,9,9,9,9,10,10,10,10,10}
+# set fmax_arr = {0.2,0.3,0.4,0.5,0.6,0.2,0.3,0.4,0.5,0.6,0.2,0.3,0.4,0.5,0.6,0.2,0.3,0.4,0.5,0.6,0.2,0.3,0.4,0.5,0.6,0.2,0.3,0.4,0.5,0.6,0.2,0.3,0.4,0.5,0.6,0.2,0.3,0.4,0.5,0.6}
+# 
+# foreach case_i (`seq 1 40`)
+# cp xx.cdl new.cdl
+# 
+# set depth_i=$soil_depth_arr[$case_i]
+# set fmax_i=$fmax_arr[$case_i]
+# 
+# set surf_file_CLONE = "surfdata_bci_panama_v1_c171113_aveDTB${depth_i}.fmax.${fmax_i}.nc" 
+# 
+# sed -i "s/FMAX = 0.2/FMAX = ${fmax_i}/g" new.cdl
+# sed -i "s/aveDTB = 3/aveDTB = ${depth_i}/g" new.cdl
+# 
+# ncgen -o $surf_file_CLONE new.cdl
+# end
+# 
+# ## new
+# total.n <- 2000
+# fates.n <- 100; surf.n <- 20
+# surf.par_arr <- rep(c(1:surf.n), each = fates.n); paste(surf.par_arr, collapse=",")
+# param_arr <- rep(c(1:fates.n), length.out = total.n); paste(param_arr, collapse=",")
+# ## so that all surf.par are covered in first few iterations, this should be changed to:
+# surf.par_arr <- rep(c(1:surf.n), length.out = total.n); paste(surf.par_arr, collapse=",")
+# param_arr <- rep(c(1:fates.n), each = surf.n); paste(param_arr, collapse=",")

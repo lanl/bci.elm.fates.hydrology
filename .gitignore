@@ -10,8 +10,8 @@
 #!/data/**
 ## but not these files
 !.gitignore
-!*.rmd
-!*.md
+!Readme.rmd
+!Readme.md
 data-raw/
 # https://stackoverflow.com/questions/44568184/gitignore-everything-except-a-subfolder-with-every-content
 .Rproj.user
