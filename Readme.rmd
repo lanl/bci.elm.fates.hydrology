@@ -1,8 +1,10 @@
 ---
-title: "Workflow"
+title: "Workflow Part II: ELM-FATES calibration for Soil Water Potentials"
 author: "Rutuja Chitra-Tarak"
 date: "12/2/2019"
 output: github_document
+subtitle: Hydraulically-vulnerable trees survive on deep-water access during droughts
+  in a tropical forest
 ---
 
 ```{r setup, include=FALSE}
