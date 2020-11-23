@@ -13,7 +13,7 @@
 
 rm(list=ls())
 if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(smooth, ncdf4, tidyverse, bci.hydromet, data.table, avasoilmoisture, hydroGOF, SemiPar)
+pacman::p_load(smooth, ncdf4, tidyverse, data.table, hydroGOF, SemiPar)
 ## Somehow SemiPar does not get installed with Pacman
 # install.packages("~/Downloads/SemiPar_1.0-4.2-2.tar", repos = NULL, type="source")
 # library(SemiPar)
@@ -59,6 +59,14 @@ params.obj.top.few.cond <- read.csv(file.path("results", current.folder, paste0(
 params.rmse <- read.csv(file = file.path("results", current.folder, "params.rmse.csv"), header = TRUE)
 ## original not standardised RMSE
 params.obj.top.few.cond.ori <- params.rmse %>% subset(par.sam %in% params.top.few)
+
+###***************************
+#### Load Observed soil moisture and ET -------
+###***************************
+load(file.path("data-raw/avasoilmoisture/vertical.rda"))
+load(file.path("data-raw/avasoilmoisture/horizontal.rda"))
+load(file.path("data-raw/bci.hydromet/forcings.rda"))
+     
 ###***************************
 #### Runoff: Obs versus model -------
 ###***************************
@@ -72,7 +80,7 @@ load(file.path("data-raw/extract", current.folder, "extract/QRUNOFF.h1.extract.R
 mod.qrunoff.d <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "date") %>%
   mutate(date = as.Date(date))
 mod.qrunoff.d[, 2:ncol(mod.qrunoff.d)] <- mod.qrunoff.d[, 2:ncol(mod.qrunoff.d)]*24*60*60/3 # converting mm/s to mm/day
-obs.qrunoff.d <- bci.hydromet::forcings %>% select(date, flow_conrad) %>% # in mm/day
+obs.qrunoff.d <- forcings %>% select(date, flow_conrad) %>% # in mm/day
   rename(obs = flow_conrad) %>% subset(date > min(mod.qrunoff.d$date, na.rm = TRUE))
 
 qrunoff.d <- obs.qrunoff.d %>% full_join(mod.qrunoff.d, by = "date")
@@ -460,7 +468,7 @@ steph.quant <- steph.sm %>%
   ungroup(depth, mean.date)
 
 ####******
-swc.vertical <- avasoilmoisture::vertical %>% rename(obs = swc) %>% 
+swc.vertical <- vertical %>% rename(obs = swc) %>% 
   group_by(date, depth) %>% summarise(obs = mean(obs, na.rm = TRUE)) %>% 
   mutate(date.depth = paste0(date, ".", depth))
 swc.vertical.mean <-  swc.vertical %>% group_by(date) %>% summarise(obs = mean(obs, na.rm = TRUE)) 
@@ -486,7 +494,7 @@ mod.swc.d$depth <- recode(mod.swc.d$depth, "0.118865065276623" = 10,
 
 mod.swc.d <- mod.swc.d %>% mutate(date.depth = paste0(date, ".", depth)) %>% as.data.frame()
 
-obs.swc.d <- avasoilmoisture::horizontal %>% 
+obs.swc.d <- horizontal %>% 
   rename(obs = swc) %>% group_by(date, depth) %>% summarise_at(vars(obs), ~mean(., na.rm = TRUE)) %>% 
   mutate(date.depth = paste0(date, ".", depth)) %>% as.data.frame() #%>%
 # bind_rows(swc.single) %>% mutate(depth = as.numeric(depth))

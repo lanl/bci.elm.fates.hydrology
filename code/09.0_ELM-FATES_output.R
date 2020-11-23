@@ -13,7 +13,7 @@
 
 rm(list=ls())
 if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(smooth, ncdf4, tidyverse, bci.hydromet, data.table, avasoilmoisture, hydroGOF, SemiPar)
+pacman::p_load(smooth, ncdf4, tidyverse, data.table, hydroGOF, SemiPar)
 ## Somehow SemiPar does not get installed with Pacman
 # install.packages("~/Downloads/SemiPar_1.0-4.2-2.tar", repos = NULL, type="source")
 # library(SemiPar)
@@ -36,6 +36,13 @@ theme_update(text = element_text(size=14),
 )
 ##--------------------------
 
+###***************************
+#### Load Observed soil moisture and ET -------
+###***************************
+load(file.path("data-raw/avasoilmoisture/vertical.rda"))
+load(file.path("data-raw/avasoilmoisture/horizontal.rda"))
+load(file.path("data-raw/bci.hydromet/forcings.rda"))
+###***************************
 
 current.folder <- "2019-10-14_5000"
 if(!dir.exists(file.path("data-raw", current.folder))) {dir.create(file.path("data-raw", current.folder))}
@@ -100,7 +107,7 @@ load(file.path("data-raw/extract", current.folder, "extract/QRUNOFF.h1.extract.R
 mod.qrunoff.d <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "date") %>%
   mutate(date = as.Date(date))
 mod.qrunoff.d[, -1] <- mod.qrunoff.d[, -1]*24*60*60/3 # converting mm/s to mm/day
-obs.qrunoff.d <- bci.hydromet::forcings %>% select(date, flow_conrad) %>% # in mm/day
+obs.qrunoff.d <- forcings %>% select(date, flow_conrad) %>% # in mm/day
   rename(obs = flow_conrad) %>% subset(date > min(mod.qrunoff.d$date, na.rm = TRUE))
 
 qrunoff.d <- obs.qrunoff.d %>% full_join(mod.qrunoff.d, by = "date")
@@ -241,7 +248,7 @@ rm(p.qrun.y)
 # mod.qrunoff.m <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "yrmo") %>%# in mm/s
 #   as.data.frame()
 # mod.qrunoff.m[, -1] <- mod.qrunoff.m[, -1]*24*60*60*30 # converting mm/s to mm/month
-# obs.qrunoff.d <- bci.hydromet::forcings %>% select(date, flow_conrad) %>% # in mm/day   
+# obs.qrunoff.d <- forcings %>% select(date, flow_conrad) %>% # in mm/day   
 #   rename(obs = flow_conrad)
 # obs.qrunoff.m <- obs.qrunoff.d %>% 
 #   mutate("yrmo" = paste0(format(date, "%Y"), "-", format(date, "%m"))) %>%
@@ -351,7 +358,7 @@ mod.qet.d <-  cbind.data.frame(mod.qvege.d[, 1], flow.columns) %>%
   mutate(date = as.Date(date))
 ## Observed ET from flux tower
 # AET.flag.day has NAs substituted where insufficient (< 50%) actual data for the day
-obs.qet.d <- bci.hydromet::forcings %>% select(date, AET, AET.flag.day) %>% # in mm/day
+obs.qet.d <- forcings %>% select(date, AET, AET.flag.day) %>% # in mm/day
   rename(obs = AET.flag.day, 
          obs.2 = AET) %>% # this is gap filled AET 
   subset(date > "2012-07-02" & date < "2017-09-01") ## date after which ET data is present
@@ -906,7 +913,7 @@ ggsave(paste0("GPP_Obs_vs_model_daily_all_years_points_lines.jpeg"), plot = p.gp
 # mod.gpp.m <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "yrmo") %>%# in mm/s
 #   as.data.frame()
 # mod.gpp.m[, -1] <- mod.gpp.m[, -1]*24*60*60 # converting rom gC/m^2/s to gC/m^2/d
-# obs.gpp.d <- bci.hydromet::forcings %>% select(date, flow_conrad) %>% # in mm/day   
+# obs.gpp.d <- forcings %>% select(date, flow_conrad) %>% # in mm/day   
 #   rename(obs = flow_conrad)
 # obs.gpp.m <- obs.gpp.d %>% 
 #   mutate("yrmo" = paste0(format(date, "%Y"), "-", format(date, "%m"))) %>%
@@ -1071,10 +1078,7 @@ rm(gpp.d.long, gpp.d, gpp.m.long, obs.gpp.d, mod.gpp.d)
 ####
 #### Soil Moisture: Obs versus model #-------
 ####
-# Daily #------
-# bci.hydromet::TDR
-# bci.hydromet::sm.historic
-####
+
 nc <- nc_open( "data-raw/DTB4.all.nc", readunlim = FALSE)
 # depths
 soil.depths <- nc$var[['H2OSOI']]$dim[[2]]$vals 
@@ -1167,7 +1171,7 @@ ggsave("swc_by_depth_stephan_data_mean_50&95CI_on_yrmo_mean.date.jpeg", plot = s
 
 
 ####-----
-swc.vertical <- avasoilmoisture::vertical %>% rename(obs = swc) %>% 
+swc.vertical <- vertical %>% rename(obs = swc) %>% 
   group_by(date, depth) %>% summarise(obs = mean(obs, na.rm = TRUE)) %>% 
   mutate(date.depth = paste0(date, ".", depth))
 swc.vertical.mean <-  swc.vertical %>% group_by(date) %>% summarise(obs = mean(obs, na.rm = TRUE)) 
@@ -1193,7 +1197,7 @@ mod.swc.d$depth <- recode(mod.swc.d$depth, "0.118865065276623" = 10,
 
 mod.swc.d <- mod.swc.d %>% mutate(date.depth = paste0(date, ".", depth)) %>% as.data.frame()
 
-obs.swc.d <- avasoilmoisture::horizontal %>% 
+obs.swc.d <- horizontal %>% 
   rename(obs = swc) %>% group_by(date, depth) %>% summarise_at(vars(obs), ~mean(., na.rm = TRUE)) %>% 
   mutate(date.depth = paste0(date, ".", depth)) %>% as.data.frame() #%>%
 # bind_rows(swc.single) %>% mutate(depth = as.numeric(depth))
@@ -1232,7 +1236,7 @@ obs.sat.d <- obs.swc.d %>%
 # ### tdr normalised or saturation.index(uses swc)
 # ## because maximas are overestimated due to macropore structure, choose value after two days
 # # norm.index2 <- function(x) {(x/max(x, na.rm = TRUE))}
-# obs.tdr.daily <- avasoilmoisture::horizontal %>% 
+# obs.tdr.daily <- horizontal %>% 
 #   rename(obs = sat.index) %>% group_by(date, depth) %>% # this is directly normalised tdr
 #   summarise(obs = mean(obs, na.rm = TRUE)) %>% as.data.frame() 
 # obs.tdr.daily.spread <- obs.tdr.daily %>% pivot_wider(names_from = depth, values_from = obs) %>% as.data.frame()

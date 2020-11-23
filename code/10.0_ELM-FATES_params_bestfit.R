@@ -6,7 +6,7 @@
 
 rm(list=ls())
 if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(ncdf4, easyNCDF, lubridate, tidyverse, bci.hydromet, data.table, avasoilmoisture, hydroGOF)
+pacman::p_load(ncdf4, easyNCDF, lubridate, tidyverse, data.table, hydroGOF)
 theme_set(theme_bw())
 theme_update(text = element_text(size=14),
              panel.grid.major = element_blank(),
@@ -14,6 +14,12 @@ theme_update(text = element_text(size=14),
              strip.background = element_blank()
 )
 
+###***************************
+#### Load Observed ET -------
+###***************************
+load(file.path("data-raw/bci.hydromet/forcings.rda"))
+
+###***************************
 current.folder <- "2019-10-14_5000"
 params.rmse <- read.csv(file = file.path("results", current.folder, "params.rmse.csv"), header = TRUE)
 params.rsq <- read.csv(file = file.path("results", current.folder, "params.rsq.csv"), header = TRUE)
@@ -284,7 +290,7 @@ View(wb.par.sam[["3130"]])
 # AET.flag.day has NAs substituted where insufficient (< 50%) actual data for the day
 # AET.flag.month has NAs substituted where insufficient (< 50%) actual data for the month
 
-obs.df <- bci.hydromet::forcings %>% select(date, Precip, AET, AET.flag.day, AET.flag.month, flow_conrad) %>%
+obs.df <- forcings %>% select(date, Precip, AET, AET.flag.day, AET.flag.month, flow_conrad) %>%
   rename(obs.ET = AET, obs.runoff = flow_conrad) %>% # in mm/day
   # check if month is before July
   mutate(date = as.Date(date),
