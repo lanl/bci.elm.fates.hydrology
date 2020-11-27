@@ -1,0 +1,197 @@
+---
+title: "BCI Soil Moisture Dynamics Simulations"
+author: "Rutuja Chitra-Tarak"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Best-fit simulations versus observations
+
+#### Evapotranspiration
+Observed Eddy flux tower Evapotranpiration against simulated ET that includes soil evaporation and vegetation evapo-transpiration 
+
+```{r Chunk 1, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+current.folder <- "2019-10-14_5000"
+knitr::include_graphics(file.path("figures", current.folder, "ET_Obs_vs_model_daily_all_years_points_lines.jpeg"))
+```
+
+Monthly sums are compared after removing data gaps, so these would be underestimations of monthly totals, but correct comparisons.
+
+```{r Chunk 1.1, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "ET_Obs_vs_model_monthly.jpeg"))
+```
+
+#### Gross Primary Productivity
+
+```{r Chunk 1.3, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+current.folder <- "2019-10-14_5000"
+knitr::include_graphics(file.path("figures", current.folder, "GPP_Obs_vs_model_daily_all_years_points_lines.jpeg"))
+```
+
+
+```{r Chunk 1.4, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "GPP_Obs_vs_model_monthly.jpeg"))
+```
+
+
+#### Runoff
+Observed stream guage against simulated QRUNOFF = QOVER(overland flow) + QDRAI (sub-surface drainage)
+
+```{r Chunk 2, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "QRUNOFF_Obs_vs_model_daily.jpeg"))
+```
+
+
+```{r Chunk 2.1, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "QRUNOFF_Obs_vs_model_monthly.jpeg"))
+```
+
+### Parameter Sensitivity 
+
+```{r Chunk 11, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "Sensitivity/Sensitivity of monthly ET to parameters_2016-04.jpeg"))
+```
+
+```{r Chunk 12, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "Sensitivity/Sensitivity of monthly ET to parameters_2016-07.jpeg"))
+```
+
+```{r Chunk 13, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "Sensitivity/Sensitivity of monthly runoff to parameters_2016-04.jpeg"))
+```
+
+```{r Chunk 14, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "Sensitivity/Sensitivity of monthly runoff to parameters_2016-07.jpeg"))
+```
+
+```{r Chunk 15, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "Sensitivity/Sensitivity of daily soil water content at 1 m to parameters_2016-04.jpeg"))
+```
+
+```{r Chunk 16, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "Sensitivity/Sensitivity of daily soil water content at 1 m to parameters_2016-07.jpeg"))
+```
+
+
+### Water balance at BCI 
+Average across best-fit parameter ensembles
+
+### Water balance fluxes and stores
+
+    Source = Water reaching soil surface = QDRIP
+    Sink = QET + QRUNOFF
+           where, QET = QSOIL + QVEGE + QVEGT
+                  QUNOFF = QOVER + QDRAI
+    Water balance = Source - Sink
+Ideally, delta TWS ~= Water balance
+
+Below runoff.sim.obs = QRUNOFF/obs.runoff; ET.sim.obs = QET/obs.ET, QDRAI.QOVER = QDRAI/QOVER, QDRAI.obs.runoff = QDRAI/obs.runoff
+
+
+## Dry season runoff fluxes 
+
+Average aross best-fit simulations for Runoff
+```{r, results='asis', echo = FALSE}
+writeLines("td, th { padding : 6px } th { background-color : brown ; color : white; border : 10px solid white; } td { color : brown ; border : 1px solid brown }", con = "mystyle.css")
+
+run.table <- read.csv(file = file.path("data", current.folder, "run.table.dryssn.csv"), header = TRUE)
+knitr::kable(run.table, format = "markdown")
+```
+
+### Water balance
+
+Average aross best-fit simulations for Runoff
+```{r, results='asis', echo = FALSE}
+writeLines("td, th { padding : 6px } th { background-color : brown ; color : white; border : 10px solid white; } td { color : brown ; border : 1px solid brown }", con = "mystyle.css")
+wb.table <- read.csv(file = file.path("data", current.folder, "wb.table.csv"), header = TRUE)
+knitr::kable(wb.table, format = "markdown")
+```
+
+
+#### Water balance related terms
+Flux/Store | Longname | Unit
+-----------|---------------------------------|--------
+TWS | total water storage | mm
+TWS_MONTH_END | total water storage at the end of a month | mm
+RAIN | atmospheric rain | mm
+QINTR | interception | mm
+QDRIP | Throughfall | mm
+QSOIL | Ground evaporation (soil/snow evaporation + soil/snow sublimation - dew | mm
+QVEGE | canopy evaporation | mm
+QVEGT | canopy transpiration | mm
+QRUNOFF | total liquid runoff (does not include QSNWCPICE) | mm/s
+QOVER | surface runoff | mm/s
+QRGWL | surface runoff at glaciers (liquid only), wetlands, lakes | mm/s
+QCHARGE | aquifer recharge rate (vegetated landunits only) | mm
+QDRAI | sub-surface drainage | mm
+ERRH2O | total water conservation error | mm
+WA | water in the unconfined aquifer (vegetated landunits only) | mm
+ZWT_PERCH | perched water table depth (vegetated landunits only) | m
+ZWT | water table depth (vegetated landunits only)| m
+H2OSFC | surface water depth | mm
+
+```{r, results='asis', echo = FALSE}
+writeLines("td, th { padding : 6px } th { background-color : brown ; color : white; border : 10px solid white; } td { color : brown ; border : 1px solid brown }", con = "mystyle.css")
+current.folder <- "2019-10-14_5000"
+dset1 <- read.csv(file = file.path("data", current.folder, "wb.table.all.csv"), header = TRUE)
+knitr::kable(dset1, format = "markdown")
+```
+
+
+#### Soil moisture dynamics 
+##### Vertical Probe 
+
+Observed absolute soil water content is from vertical TDR (0-15 cm) that is locally calibrated
+
+```{r Chunk 3, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "swc_Obs_vs_model_daily_vertical.jpeg"))
+```
+
+##### Horizontal Probes
+
+Best-fits are chosen in two steps: (1) Top-ten simulations for each depth (10, 40 and 100 cm) are chosen by maximising fit (minimising RMSE) with plot-wide opportunistic observations of absolute water content at those detphs, (2) a subset of (a) are then chosen such that they fit well (maximising R-squared) with water content from horizontal TDRs (depths 10, 40 and 100 cm) at a point location. As depth-specific calibration was not available for the horizontal probes, they were originally calibrated with the same local calibration as that of the vertical TDR probe. Thus only depth-specific relative variation in water content from the horizontal probes (via R-squared) is used in finding best-fits. For easy visulation horizontal probes values are normalised in the range of simulations from (1).
+
+Panel labels represent depths in cm
+
+```{r Chunk 5, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "swc_Obs_vs_model_daily_horizontal_with_steph_mean.jpeg"))
+```
+
+#### Soil moisture by depth for best-fit parameter ensembles
+
+Panel labels represent depths in m
+
+```{r Chunk 6, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "swc_model_daily_all_depths_params.top.few.jpeg"))
+```
+
+#### Soil moisture by depth: Average across best-fit parameter ensembles
+
+```{r Chunk 7, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "swc_mean_across_params.top.few.jpeg"))
+```
+
+#### Water-stress across best-fit parameter ensembles
+
+```{r Chunk 8, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "BTRAN_model_daily_bestfit_params.top.few_CI.jpeg"))
+```
+
+#### Soil Water Potential by depth across best-fit parameter ensembles -- 1990-2018
+Heatmap
+
+```{r Chunk 9, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "psi_mean_across_params.top.few_full.jpeg"))
+```
+
+#### Soil Water Potential by depth across best-fit parameter ensembles -- 1990-2018
+
+```{r Chunk 10, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "psi_model_daily_all_depths_params.top.few_full.jpeg"))
+```
+
