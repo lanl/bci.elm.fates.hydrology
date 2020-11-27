@@ -1,0 +1,110 @@
+---
+title: "Individual flux best-fits"
+author: "Rutuja Chitra-Tarak"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Best-fit simulations versus observations
+**Best-fits shown are the one with minimum RMSE**
+All monthly or annual totals are calculated after removing simulated values when observations were absent. So these totals could be underestimates, but would give correct statistic for comparisons.
+
+#### Evapotranspiration
+Observed Eddy flux tower Evapotranpiration against simulated ET that includes soil evaporation and vegetation evapo-transpiration: 
+
+```{r Chunk 1.00, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+current.folder <- "2019-10-14_5000"
+knitr::include_graphics(file.path("figures", current.folder, "ET_Obs_vs_model_daily_all_years_points_lines.jpeg"))
+```
+
+Daily totals: Best-fits and statistics on the graph are for **daily** totals:
+
+```{r Chunk 1.01, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "ET_Obs_vs_model_daily_all_years.jpeg"))
+```
+
+Daily totals: Best-fits and statistics on the graph are for **annual** totals:
+
+```{r Chunk 1.02, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "ET_Obs_vs_model_daily_all_years_yearly.jpeg"))
+```
+
+Monthly totals: Best-fits and statistics on the graph are for **monthly** totals:
+
+```{r Chunk 1.03, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "ET_Obs_vs_model_monthly.jpeg"))
+```
+
+Monthly totals: Best-fits and statistics on the graph are for **annual** totals:
+
+```{r Chunk 1.04, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "ET_Obs_vs_model_monthly_yearly.jpeg"))
+```
+
+**Thus for ET best-fits should be chosen with minimum RMSE for monthly, yearly and daily scales, can ignore R-squared. For daily no simulation has a good R-squared.**
+
+
+#### Runoff
+Observed stream guage against simulated QRUNOFF = QOVER(overland flow) + QDRAI (sub-surface drainage):
+
+Daily totals: Best-fits and statistics on the graph are for **daily** totals:
+
+```{r Chunk 3.01, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "QRUNOFF_Obs_vs_model_daily.jpeg"))
+```
+
+Daily totals: Best-fits and statistics on the graph are for **annual** totals:
+
+```{r Chunk 3.02, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "QRUNOFF_Obs_vs_model_daily_yearly.jpeg"))
+```
+
+Monthly totals: Best-fits and statistics on the graph are for **monthly** totals:
+
+```{r Chunk 3.03, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "QRUNOFF_Obs_vs_model_monthly.jpeg"))
+```
+
+Monthly totals: Best-fits and statistics on the graph are for **annual** totals:
+
+```{r Chunk 3.04, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "QRUNOFF_Obs_vs_model_monthly_yearly.jpeg"))
+```
+
+**Best-fits for QRUNOFF based on annual totals (min RMSE) are trying to get the two extreme years with peaks right (heavy overland flow?), but in doing that this overestimates other years. Whereas those that maximise *Rsq* with annual totals does not suffer from this and, in fact, seem to match the absolute monthly variation in some years better than the monthly best-fits--either based on min RMSE or max Rsq. So best-fits for QRUNOFF should not be chosen based on min RMSE yearly, but be chosen with minimum RMSE for monthly, and max Rsq for yearly. Daily also has a good max R-squared (0.41). Monthly R-sq also high at ~0.8.**
+
+#### Gross Primary Productivity
+
+```{r Chunk 2.00, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+current.folder <- "2019-10-14_5000"
+knitr::include_graphics(file.path("figures", current.folder, "GPP_Obs_vs_model_daily_all_years_points_lines.jpeg"))
+```
+
+Daily totals: Best-fits and statistics on the graph are for **daily** totals:
+
+```{r Chunk 2.01, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "GPP_Obs_vs_model_daily.jpeg"))
+```
+
+Daily totals: Best-fits and statistics on the graph are for **annual** totals:
+
+```{r Chunk 2.02, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "GPP_Obs_vs_model_daily_yearly.jpeg"))
+```
+
+Monthly totals: Best-fits and statistics on the graph are for **monthly** totals:
+
+```{r Chunk 2.03, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "GPP_Obs_vs_model_monthly.jpeg"))
+```
+
+Monthly totals: Best-fits and statistics on the graph are for **annual** totals:
+
+```{r Chunk 2.04, eval = TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width = "100%", fig.pos = 'H', fig.cap = ""}
+knitr::include_graphics(file.path("figures", current.folder, "GPP_Obs_vs_model_monthly_yearly.jpeg"))
+```
+
+**For GPP no daily simulation has a good R-squared. Max monthly R-sq also at 0.13. Yearly best-fits do not seem to improve daily/monthly fits either, at least visually. Perhaps yearly min RMSE should be used to choose.**
