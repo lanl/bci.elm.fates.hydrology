@@ -19,21 +19,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ### 2. Generate parameter files
 
 1.  FATES param files dependencies:
-Parameter range for roob_b parameters are generated here: 2.0_root_parameters_b.R
-Can verify that different root a can give same b: data-raw/estimation of root_b_par_same_b_for_different as.xlsx
+    + Parameter range for roob_b parameters are generated here: 2.0_root_parameters_b.R
+    + Can verify that different root a can give same b: data-raw/estimation of root_b_par_same_b_for_different as.xlsx
 Other ranges are based on literature, or Zailaa et al. 2020
 
 2.  ELM param files dependencies:
 fpi_max ranges are generated from here: 
-## First throughfall from Zimmermann et al and rain data from STRI at Lutz are linked: `code/3.0_Throughfall.R`
-## As rainfall data is not given in Zimmermann and throughfall data is collected for rainfall events (duration, amount and gap between events), rainfall that composes those events are inferred in Excel.
-And range of interception found for events > 10 mm: data-raw/throughfall_rain_hourly_for_inspection_new.xlsx
+    + First throughfall from Zimmermann et al and rain data from STRI at Lutz are linked: `code/3.0_Throughfall.R`
+    + As rainfall data is not given in Zimmermann and throughfall data is collected for rainfall events (duration, amount and gap between events), rainfall that composes those events are inferred in Excel. Then range of interception is found for events > 10 mm: data-raw/throughfall_rain_hourly_for_inspection_new.xlsx
 
 3.  Surface data files dependencies:
-Soil testure data and soil organic content data is gathered and defined here:
+Soil texture data and soil organic content data is gathered and defined here:
 `code/4.0_Surfdata_texture_options.R` But these are not used by the model as it is forced with   
-    + soil characteristic curves (SWC to Matric potential) using Stephan Kupers' data (Yilin's equation), as well as, bci.hydromet/data-raw/soil_retention_curves_stephan.R
-    +  soil hydraulic conductivity, using Godsey & Stallard et al defined here: `code/5.0_Surfdata_Ksat_obs_and_bootstrapped_param.R`
+    1. soil characteristic curves (Soil Water Content to Soil Water Potential) using Stephan Kupers' data, as well as, bci.hydromet/data-raw/soil_retention_curves_stephan.R
+    2. soil hydraulic conductivity, using Godsey & Stallard et al defined here: `code/5.0_Surfdata_Ksat_obs_and_bootstrapped_param.R`
 
 4.  Surface data for ELM, ELM parameters and FATES paramater files 
 `code/6.0_Generate_parameter files.R`
@@ -41,9 +40,9 @@ These are transferred to the server.
 
 ### 3. Run simulations
 
-Follow Google Doc 3.0_Running ELM-FATES with parameter ensembles @ Shared drive/Rutuja_work/web_only/ <https://docs.google.com/document/d/1qqbkQGHMG8BMfrUejUlkBU3PvUqPuW0Pc6CBLBQzZZk/edit#heading=h.gjdgxs>
+1. Follow Google Doc 3.0_Running ELM-FATES with parameter ensembles @ Shared drive/Rutuja_work/web_only/ <https://docs.google.com/document/d/1qqbkQGHMG8BMfrUejUlkBU3PvUqPuW0Pc6CBLBQzZZk/edit#heading=h.gjdgxs>
 
-Thus run ensemble members and extract simulations on the server with `code/8.0_main.R` (which in turn sources `code/7.0_fun_extract.R`) and transfer back to the desktop storing at a specific dated location such as data-raw/extract/2019-10-14_5000
+2. Thus run ensemble members and extract simulations on the server with `code/8.0_main.R` (which in turn sources `code/7.0_fun_extract.R`) and transfer back to the desktop storing at a specific dated location such as data-raw/extract/2019-10-14_5000
 
 ### 4. Calibration and Sensitivity Analyses
 
