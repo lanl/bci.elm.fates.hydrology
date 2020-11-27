@@ -2,8 +2,13 @@
 title: "BCI Soil Moisture Dynamics Simulations"
 author: "Rutuja Chitra-Tarak"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
+<<<<<<< HEAD
 output:
   html_document:
+=======
+output: 
+  html_document: 
+>>>>>>> 23b8be053133f62bbdece5389e08cc1332b4d028
     keep_md: yes
 ---
 
