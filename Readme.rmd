@@ -31,7 +31,9 @@ fpi_max ranges are generated from here:
 3.  Surface data files dependencies:
 Soil texture data and soil organic content data is gathered and defined here:
 `code/4.0_Surfdata_texture_options.R` But these are not used by the model as it is forced with   
+
     1. soil characteristic curves (Soil Water Content to Soil Water Potential) using Stephan Kupers' data, as well as, bci.hydromet/data-raw/soil_retention_curves_stephan.R
+
     2. soil hydraulic conductivity, using Godsey & Stallard et al defined here: `code/5.0_Surfdata_Ksat_obs_and_bootstrapped_param.R`
 
 4.  Surface data for ELM, ELM parameters and FATES paramater files 
