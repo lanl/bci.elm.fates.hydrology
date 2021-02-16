@@ -10,6 +10,7 @@
 #!/data/**
 ## but not these files
 !.gitignore
+!DESCRIPTION
 !*.rmd
 !*.md
 data-raw/

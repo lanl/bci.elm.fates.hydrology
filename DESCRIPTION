@@ -1,0 +1,14 @@
+Package: bci.elm.fates.hydrology
+Title: Hydrology outputs from ELM-FATES calibrated at BCI
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Rutuja",
+           family = "Chitra-Tarak",
+           role = c("aut", "cre"),
+           email = "arutuj@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
