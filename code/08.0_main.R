@@ -1,9 +1,17 @@
 rm(list = ls())
-library(ncdf4)
+if (!require("groundhog")) install.packages("groundhog")
+library(groundhog)
+groundhog.folder <- paste0("groundhog.library")
+if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
+set.groundhog.folder(groundhog.folder)
+pacman::p_load(ncdf4, easyNCDF, tidyverse)
+groundhog.day = "2021-01-01"
+pkgs=c('ncdf4')
+groundhog.library(pkgs, groundhog.day)
 # wd <-"/turquoise/usr/projects/veg/rutuja/ACME_cases/BCI/FATES.Sen/OutputExtract/" # on server
 
 # source(file.path(wd, "1.0_fun_extract.R")) # on server
-source(file.path("R","1.0_fun_extract.R")) # on desktop
+source(file.path("R","07.0_fun_extract.R")) # on desktop
 # outdir <- "/lustre/scratch3/turquoise/rutuja/ACME/cases" # on server
 current.folder <- "2019-10-14_5000/tlai_reduction" # on desktop
 outdir <- paste0("data-raw/", current.folder, "/extract")  # on desktop

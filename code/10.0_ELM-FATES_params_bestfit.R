@@ -5,8 +5,15 @@
 ##---------------------------
 
 rm(list=ls())
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(ncdf4, easyNCDF, lubridate, tidyverse, data.table, hydroGOF)
+if (!require("groundhog")) install.packages("groundhog")
+library(groundhog)
+groundhog.folder <- paste0("groundhog.library")
+if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
+set.groundhog.folder(groundhog.folder)
+groundhog.day = "2021-01-01"
+pkgs=c("ncdf4", "easyNCDF", "lubridate", "tidyverse", "data.table", "hydroGOF")
+groundhog.library(pkgs, groundhog.day)
+
 theme_set(theme_bw())
 theme_update(text = element_text(size=14),
              panel.grid.major = element_blank(),

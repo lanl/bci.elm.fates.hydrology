@@ -3,10 +3,16 @@
 # Author: Rutuja Chitra-Tarak
 # Date: Aug 15, 2019
 ##-----------------
-
 rm(list=ls())
-if (!require("pacman")) install.packages("pacman"); library(pacman)
+if (!require("groundhog")) install.packages("groundhog")
+library(groundhog)
+groundhog.folder <- paste0("groundhog.library")
+if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
+set.groundhog.folder(groundhog.folder)
 pacman::p_load(ncdf4, easyNCDF, tidyverse)
+groundhog.day = "2021-01-01"
+pkgs=c('ncdf4', 'tidyverse', 'easyNCDF')
+groundhog.library(pkgs, groundhog.day)
 ##-----------------
 ## Generate parameter ensembles for all parameters together: fates, elm and surface, 
 ## then substitute generated ensemble streams for fates, elm and surface into copies of a sample paramater file corresponding to fates, elm and surface

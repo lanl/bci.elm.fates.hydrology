@@ -3,9 +3,19 @@
 
 rm(list=ls())
 
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(ncdf4, easyNCDF, tidyverse)
-
+#*******************************************
+####   Load Libraries, Prep for graphics, folders  ####
+#*******************************************
+#### Written  with R version 3.6.3 ###
+#*******************************************
+if (!require("groundhog")) install.packages("groundhog")
+library(groundhog)
+groundhog.folder <- paste0("groundhog.library")
+if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
+set.groundhog.folder(groundhog.folder)
+groundhog.day = "2021-01-01"
+pkgs=c('ncdf4', 'tidyverse', 'easyNCDF')
+groundhog.library(pkgs, groundhog.day)
 # FATES uses equation (2) in Zeng et al.
 ## y = 1 - 0.5(exp(-a*d) + exp(-b*d)) ....(eq 1)
 # where d = depth and Y = root fraction, a = fates_roota_par, b = fates_rootb_par
@@ -98,7 +108,7 @@ cum.rf.par <- cum.rf.par %>% bind_cols(rf.par.big) %>%
   mutate(root.frac = cum.root.frac - lag(cum.root.frac, default = 0)) %>%
   ungroup(rf.sam)
 
-require(scales);
+groundhog.library('scales', groundhog.day)
 rev_sqrt_trans <- function() {
   scales::trans_new(
     name = "rev_sqrt", 
@@ -210,7 +220,7 @@ ggsave(file.path(paste0("figures/rooting_profiles_for_inversion.jpeg")), height 
 write.csv(profiles, "data-raw/root_profiles.csv", row.names = FALSE)
 
 from <- c(NA, soil.depths); to <- c(NA, 1:length(soil.depths))
-library(plyr)
+groundhog.library('plyr', groundhog.day)
 profiles <- profiles %>% 
   mutate(soil.levels = plyr::mapvalues(depth, from, to),
   rf.sam.soil.levels = paste(rf.sam, soil.levels, sep = "."))
