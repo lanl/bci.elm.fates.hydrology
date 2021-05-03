@@ -10,9 +10,13 @@
 
 ## creating table of Btran
 
-rm(list=ls())
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(ncdf4, easyNCDF, lubridate, tidyverse, data.table, doParallel, foreach)
+library(groundhog)
+groundhog.folder <- paste0("groundhog.library")
+if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
+set.groundhog.folder(groundhog.folder)
+groundhog.day = "2021-01-01"
+pkgs=c("lubridate", "tidyverse", "data.table")
+groundhog.library(pkgs, groundhog.day)
 
 theme_set(theme_bw())
 theme_update(text = element_text(size=14),
@@ -33,6 +37,13 @@ rev_sqrt_trans <- function() {
     inverse = function(x) x^2);
 }
 
+reverselog_trans <- function(base = exp(1)) {
+  scales::trans_new(name = paste0("reverselog-", format(base)),
+                    log_breaks(base = base),
+                    domain = c(1e-100, Inf),
+                    transform = function(x) -log(x, base),
+                    inverse = function(x) base^(-x))
+}
 current.folder <- "2019-10-14_5000"
 sub.folder <- "best-fits.full"
 if(!dir.exists(file.path("figures", current.folder, "best-fits.full"))) {dir.create(file.path("figures", current.folder, "best-fits.full"))}
@@ -49,9 +60,12 @@ load(file.path("data/psi.rda"))
 load(file.path("data/psi.mean.rda"))
 ## by depth panels
 plot.psi <- ggplot(psi, aes(x = date, y = -psi)) +
-  scale_y_continuous(trans="rev_sqrt", breaks = c(0, 0.5, 2, 5, 10, 15)) +
+  scale_y_continuous(trans=reverselog_trans(10),
+                     breaks = c(0.001, 0.01, 0.1, 1, 10, 100),
+                     labels = c(0.001, 0.01, 0.1, 1, 10, 100)) +
+  annotation_logticks() +
   geom_line(aes(group = par.sam, color = as.factor(par.sam)), show.legend = F, size = 0.2) +
-  geom_vline(xintercept = census.beg, color = "gray") +
+  geom_vline(xintercept = c(as.Date("1991-01-01"), census.beg[-1]), color = "gray") +
   facet_grid(depth ~ .) +
   ylab("-Soil Water Potential [MPa]") + xlab("Date") + 
   scale_x_date(date_breaks = "1 year", labels = function(x) format(x, "%Y")) +
@@ -60,9 +74,13 @@ plot.psi <- ggplot(psi, aes(x = date, y = -psi)) +
 ggsave("psi_model_daily_all_depths_params.top.few_full.jpeg", plot = plot.psi, path = 
          file.path("figures", current.folder, sub.folder), height = 12, width = 8.94, units='in')
 
+plot.psi.for.ERD <- plot.psi %+% subset(psi, date >= as.Date("1991-01-01")) 
+ggsave("psi_model_daily_all_depths_params.top.few_full_beg_1991.jpeg", plot = plot.psi.for.ERD, path = 
+         file.path("figures", current.folder, sub.folder), height = 12, width = 8.94, units='in')
+
 # Heatmap 
 plot.psi.mean <- ggplot(psi.mean, aes(date, as.factor(-depth), fill = psi)) + 
-  geom_tile() + ylab("Depth [m]") + xlab("Date") +   
+  geom_tile() + ylab("Depth [m]") + xlab("Date") +
   scale_fill_viridis_c("PSI [MPa]", trans = "reverse", option = "plasma") +
   ggtitle("Average SOILPSI by depth across best-fit ensembles")
 ggsave("psi_mean_across_params.top.few_full.jpeg", plot = plot.psi.mean, path = 

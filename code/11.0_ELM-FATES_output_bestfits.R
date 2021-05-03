@@ -11,9 +11,14 @@
 ## Check fit for each soil depth
 ## Choose the best
 
-rm(list=ls())
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(smooth, ncdf4, tidyverse, data.table, hydroGOF, SemiPar)
+library(groundhog)
+groundhog.folder <- paste0("groundhog.library")
+if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
+set.groundhog.folder(groundhog.folder)
+groundhog.day = "2021-01-01"
+pkgs=c("smooth","ncdf4", "tidyverse", "data.table", "hydroGOF", "SemiPar")
+groundhog.library(pkgs, groundhog.day)
+
 ## Somehow SemiPar does not get installed with Pacman
 # install.packages("~/Downloads/SemiPar_1.0-4.2-2.tar", repos = NULL, type="source")
 # library(SemiPar)

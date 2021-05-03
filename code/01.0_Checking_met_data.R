@@ -3,8 +3,157 @@
 ## sourcing all .nc files
 rm(list = ls())
 graphics.off()
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(ncdf4, tidyverse, bci.hydromet, data.table, chron)
+
+#*******************************************
+####   Load Libraries, Prep for graphics, folders  ####
+#*******************************************
+#### Written  with R version 4 ###
+#*******************************************
+#*
+#*if (!require("groundhog")) install.packages("groundhog");
+if (!require("groundhog")) install.packages("groundhog")
+library(groundhog)
+groundhog.folder <- paste0("groundhog.library")
+if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
+set.groundhog.folder(groundhog.folder)
+groundhog.day = "2021-01-01"
+pkgs=c('ncdf4', 'tidyverse', 'data.table', 'chron')
+groundhog.library(pkgs, groundhog.day)
+library(bci.hydromet)
+
+###-------------------
+### Recycle climate drivers. Use 1985-1994 to substitute 1975-1984
+### But use rainfall from rainguage data
+###-------------------
+### Boris's data - 2018 substituted by rutuja
+###-------------------
+raw.dat <- read.csv("data-raw/BCI_1985_2018c_mod_2018substituted.csv")
+str(raw.dat)
+# converting to system time zone
+
+raw.dat$datetime <- as.POSIXct(raw.dat$DateTime, format = "%m/%d/%y %H:%M", tz = "America/Panama")
+head(raw.dat$datetime)
+# the above takes in the given data as in Panama format, but converts it to Sys timezone
+# so to convert to GMT:
+attr(raw.dat$datetime, "tzone") <- "GMT"
+head(raw.dat$datetime)
+
+###------------To recycle ------- 
+
+dif.10yr <- raw.dat$datetime[1] - as.POSIXct("12/31/74 0:00", format = "%m/%d/%y %H:%M", tz = "America/Panama")
+ 
+recycle <- raw.dat %>%
+  subset(datetime %in% seq(from = as.POSIXct("1987-01-01 16:00:00", tz = "America/Panama"),
+                           to = as.POSIXct("1997-01-02 15:00:00", tz = "America/Panama"), by = 60*60)) %>%
+  mutate(datetime = datetime - dif.10yr,
+         DateTime = format(datetime, format = "%m/%d/%y %H:%M", tz = "America/Panama"))
+
+## Sub BCI observed rainfall from 1975 to 1984
+## But it's daily, so interpolate
+recycle$date <- as.Date(recycle$datetime)
+head(recycle); tail(recycle)
+head(raw.dat)
+
+# obs.data <- bci.hydromet::bci.met %>% 
+#   subset(date %in% recycle$date[1]:recycle$date[nrow(recycle)]) %>% 
+#   select(date, Precip) %>%
+#   mutate(datetime = as.POSIXct(date, tz = "America/Panama")) %>%
+#   select(-date)
+# attr(obs.data$datetime, "tzone") <- "America/Panama"
+# 
+# obs.data <- obs.data %>% 
+#   arrange(datetime) %>%
+#   # for the first census assume Precip is collected over the past day
+#   mutate(n.hrs = c(24, c(as.numeric(datetime - lag(datetime))*24)[-1])) %>%
+#   #  Precip per hr for the census interval is stored on the hr of the census:
+#   # in mm/hr
+#   mutate(Precip.rate = Precip/n.hrs,
+#          # approx() will interpolate this forward until the next census,
+#          # we want it to interpolate this value backward over the past census interval,
+#          # so just for computation purposes, leading this value
+#          Precip.rate_lead = lead(Precip.rate, n = 1))
+# df <- recycle %>% left_join(obs.data, by = "datetime")
+# 
+# # Interpolate:
+# x <- df$datetime
+# y <- df$Precip.rate_lead
+# xout <- df$datetime[is.na(df$Precip.rate_lead)]
+# ## method = "constant" would be more parsimonious
+# yout <- approx(x, y, xout, method = "constant")
+# 
+# # Gap-fill
+# recycle.2 <- df %>%
+#   # Remove recycled data
+#   select(-Rainfall_mm_hr) %>%
+#   left_join(data.frame(datetime = yout$x, Rainfall_mm_hr = yout$y), by = "datetime") %>%
+#   ## filling interpolation gap on the day of the census
+#   mutate(Rainfall_mm_hr = ifelse(is.na(Precip.rate), Rainfall_mm_hr, Precip.rate),
+#          ## filling-up few NAs at the beginning and the end fpr less than half a day
+#          Rainfall_mm_hr = ifelse(is.na(Rainfall_mm_hr), 0, Rainfall_mm_hr))
+# summary(recycle.2$Rainfall_mm_hr)
+# 
+# recy.dat <- bind_rows(recycle.2 %>% select(colnames(raw.dat)), raw.dat)
+# 
+# recy.dat$datetime <- recy.dat$datetime - 60*60
+# head(recy.dat)
+# recy.dat$year <- format(recy.dat$datetime, "%Y")
+# recy.dat.yr<- recy.dat %>% subset(!is.na(year) & year != 2019) %>%
+#   group_by(year) %>%
+#   summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
+# ggplot(recy.dat.yr, aes(x = year, y = rain)) +
+#   geom_bar(stat = "identity") +
+#   theme(axis.text.x = element_text(face = "plain", angle = 90, vjust = 1, hjust = 1))
+# 
+# obs.data.long <- bci.hydromet::bci.met %>% 
+#   mutate(year = format(date, "%Y")) %>%
+#   subset(year %in% 1975:2019) %>% 
+#   select(date, Precip, year)
+# 
+# obs.data.long.yr <- obs.data.long %>% subset(!is.na(year) & year != 2019) %>%
+#   group_by(year) %>%
+#   summarise(rain = sum(Precip, na.rm = TRUE)) # mm
+# ggplot(obs.data.long.yr, aes(x = year, y = rain)) +
+#   geom_bar(stat = "identity") +
+#   theme(axis.text.x = element_text(face = "plain", angle = 90, vjust = 1, hjust = 1))
+
+obs.data.long$moyr <- format(obs.data.long$datetime, "%y-%m")
+obs.data.long.moyr <- obs.data.long %>% subset(!is.na(moyr) & year %in% c(2016:2018)) %>%
+  group_by(moyr) %>%
+  summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
+ggplot(obs.data.long.moyr, aes(x = moyr, y = rain)) +
+  geom_bar(stat = "identity" )
+
+###------Older code
+# so somehow it doesn't work, so removing one hour
+raw.dat$datetime <- raw.dat$datetime - 60*60
+head(raw.dat)
+raw.dat$year <- format(raw.dat$datetime, "%Y")
+raw.dat.yr<- raw.dat %>% subset(!is.na(year) & year != 2019) %>%
+  group_by(year) %>%
+  summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
+ggplot(raw.dat.yr, aes(x = year, y = rain)) +
+  geom_bar(stat = "identity")
+## 2018 seems really low: checking which months
+## That was before substitution not after
+raw.dat$moyr <- format(raw.dat$datetime, "%y-%m")
+raw.dat.moyr <- raw.dat %>% subset(!is.na(moyr) & year %in% c(2016:2018)) %>%
+  group_by(moyr) %>%
+  summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
+ggplot(raw.dat.moyr, aes(x = moyr, y = rain)) +
+  geom_bar(stat = "identity" )
+View(raw.dat.moyr)
+
+
+#*******************************************
+#*******************************************
+# to create .nc file:
+# go to data-raw/ConvertMetCSVtoCLM-expand-format
+# python ConvertMetCSVtoCLMALM.py --f=/Users/rutuja/Work_at_LANL/clm_fates_hydrology/data-raw/ConvertMetCSVtoCLM-expand-format/convert_controls_bci33.xml
+# python ConvertMetCSVtoCLMALM.py --f=/Users/ftuser/Work_at_LANL/Projects/bci.elm.fates.hydrology/data-raw/ConvertMetCSVtoCLM-expand-format/convert_controls_bci33.xml
+
+#*******************************************
+
+
 
 path = "data-raw/ConvertMetCSVtoCLM-expand-format/NCOut/bci_0.1x0.1_met.v5.1/CLM1PT_data"
 
@@ -140,37 +289,6 @@ xx.long <- gather(xx, key = "variable", value = "value", -datetime, -year)
 ggplot(xx.long, aes(x = datetime, y = value)) +
   geom_point() +
   facet_wrap( ~ variable, scales = "free_y")
-###-------------------
-### Boris's data - 2018 substituted by rutuja
-###-------------------
-raw.dat <- read.csv("data-raw/BCI_1985_2018c_mod_2018substituted.csv")
-str(raw.dat)
-# converting to system time zone
-
-raw.dat$datetime <-  as.POSIXct(raw.dat$DateTime, format = "%m/%d/%y %H:%M", tz = "America/Panama")
-head(raw.dat$datetime)
-# the above takes in the given data as in Panama format, but converts it to Sys timezone
-# so to convert to GMT:
-attr(raw.dat$datetime, "tzone") <- "GMT"
-head(raw.dat$datetime)
-# so somehow it doesnt work, so removing one hour
-raw.dat$datetime <- raw.dat$datetime - 60*60
-head(raw.dat)
-raw.dat$year <- format(raw.dat$datetime, "%Y")
-raw.dat.yr<- raw.dat %>% subset(!is.na(year) & year != 2019) %>%
-  group_by(year) %>%
-  summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
-ggplot(raw.dat.yr, aes(x = year, y = rain)) +
-  geom_bar(stat = "identity")
-## 2018 seems really low: checking which months
-## That was before substitution not after
-raw.dat$moyr <- format(raw.dat$datetime, "%y-%m")
-raw.dat.moyr <- raw.dat %>% subset(!is.na(moyr) & year %in% c(2016:2018)) %>%
-  group_by(moyr) %>%
-  summarise(rain = sum(Rainfall_mm_hr, na.rm = TRUE)) # m3/m2*1000 == L/m2 == mm
-ggplot(raw.dat.moyr, aes(x = moyr, y = rain)) +
-  geom_bar(stat = "identity" )
-View(raw.dat.moyr)
 
 # ###-------------------
 # ### Ryan's data
