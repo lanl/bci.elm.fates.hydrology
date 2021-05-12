@@ -9,10 +9,10 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Included datasets:
+Included datasets in this archive are listed in the table below. Only psi is used for analyses in Chitra-Tarak et al. New Phytologist 2021.
 
 Variable    |Description 										                                                        | Units
---------    |-----------											                                                      |-----
+------------|---------------------------------------------------------------------------------------|-----
 psi 		    |Daily Soil Water Potential	by depth and par.sam*				                                | MPa
 psi.mean    |Daily Soil Water Potential by depth averaged across par.sam			  	                  | MPa
 swc 		    |Daily Soil Water content	by depth and par.sam  			                                  | v/v
@@ -20,28 +20,27 @@ paw			    |Daily plant available water content i.e. swc - swc.wilt*** by depth a
 btran**     |Daily soil water stress factor by par.sam.                                             | unitless
 btran.stat  |Daily mean and 95%CI soil water stress factor across par.sam                           | unitless
 
-\* par.sam refers to one of the best-fit parameter ensemble members given in xxxx  
+\* par.sam refers to one of the best-fit parameter ensemble members given in params.top.few.cond_100.csv  
 ** The function btran (Bt) is the weighted average over the entire soil column and ranges from one when the soil is wet to near zero when the soil is dry and depends on the soil water potential of each soil layer, the root distribution of the plant functional type (here a single PFT), and a plant-dependent response to soil water stress. See CLM4.5 Technical Note for details.  
 
 ***swc.wilt = swc at wilting point, here 0.17 v/v. See below:  
 
-> swc wilting point is calculated using Clapp & Hornberger eqn 1978: 
+swc wilting point is calculated using Clapp & Hornberger eqn 1978. In ELM file biogeophysSoilStateType.F90  :
 
-> In ELM file biogeophysSoilStateType.F90  
+```
+real(r8), pointer :: watsat_col           (:,:) ! col volumetric soil water at saturation (porosity)  
+real(r8), pointer :: sucsat_col           (:,:) ! col minimum soil suction (mm) (nlevgrnd)  
+real(r8), pointer :: bsw_col              (:,:) ! col Clapp and Hornberger "b" (nlevgrnd)  
+real(r8), parameter :: min_liquid_pressure = -10132500._r8 ! Minimum soil liquid water pressure [mm]  
 
-> real(r8), pointer :: watsat_col           (:,:) ! col volumetric soil water at saturation (porosity)  
-> real(r8), pointer :: sucsat_col           (:,:) ! col minimum soil suction (mm) (nlevgrnd)  
-> real(r8), pointer :: bsw_col              (:,:) ! col Clapp and Hornberger "b" (nlevgrnd)  
-> real(r8), parameter :: min_liquid_pressure = -10132500._r8 ! Minimum soil liquid water pressure [mm]  
+this%watmin_col(c,lev) = &  
+this%watsat_col(c,lev)*(-min_liquid_pressure/this%sucsat_col(c,lev))**(-1._r8/this%bsw_col(c,lev))  
 
-> this%watmin_col(c,lev) = &  
-> this%watsat_col(c,lev)*(-min_liquid_pressure/this%sucsat_col(c,lev))**(-1._r8/this%bsw_col(c,lev))  
+this%watsat_col(c,lev)    = 0.51_r8  
+this%bsw_col(c,lev)       = 10_r8  
+this%sucsat_col(c,lev)    = 200.0_r8  
+```
+Thus, swc_wilt = watmin = 0.51*(10132500/200)^(-1/10) = 0.173 [v/v]  
 
-> this%watsat_col(c,lev)    = 0.51_r8  
-> this%bsw_col(c,lev)       = 10_r8  
-> this%sucsat_col(c,lev)    = 200.0_r8  
-
-> Thus, swc_wilt = watmin = 0.51*(10132500/200)^(-1/10) = 0.173 [v/v]  
-
-> Parameter values are as described in accompanying manuscript Chitra-Tarak et al. 2020   
+Parameter values are as described in accompanying manuscript Chitra-Tarak et al. New Phytologist 2021   
 
