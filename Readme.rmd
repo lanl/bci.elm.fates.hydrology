@@ -57,7 +57,7 @@ These are transferred to the server.
 ### 4. Re-Run simulations for best-fits for the entire study period
 
 Now for the chosen best-fits re-run simulations covering the entire time-period of 1985-2018
-Follow Google Doc 4.0_Running ELM-FATES for best-fit parameter (and `code/12.0_Prep_for_Best-fit_case_runs.R` to generate par.sam numbers seperated by commas) ensembles<https://docs.google.com/document/d/1q6gC5nPrlcnaxl7WvHHVr-Yzu2xBZlIu4b1OcHdGdOc/edit#heading=h.mn9abqhwo6l5>
+Follow Google Doc 4.0_Running ELM-FATES for best-fit parameter ensembles (and `code/12.0_Prep_for_Best-fit_case_runs.R` to generate par.sam numbers seperated by commas): <https://docs.google.com/document/d/1q6gC5nPrlcnaxl7WvHHVr-Yzu2xBZlIu4b1OcHdGdOc/edit#heading=h.mn9abqhwo6l5>
 
 ### 5. Extract, plot and save Soil Water Potentials as a data-package
 
@@ -70,4 +70,11 @@ Follow Google Doc 4.0_Running ELM-FATES for best-fit parameter (and `code/12.0_P
   3. Plot the entire time-series of SWC, SWP and ELM-FATES generated BTRAN for best-fit simulations.
 `code/14.0_Plotting best-fits_full.R`
 
+
+```{r Chunk Readme-data, eval = FALSE}
+groundhog.day = "2021-01-01"
+groundhog.library('rmarkdown', groundhog.day)
+rmarkdown::render("Readme.rmd", output_format = "pdf_document")
+rmarkdown::render("Readme_data.rmd", output_format = "pdf_document")
+```
 
