@@ -9,12 +9,13 @@
 # for z soil layers.
 
 ## creating table of Btran
+if (!require("groundhog")) install.packages("groundhog")
 library(groundhog)
 groundhog.folder <- paste0("groundhog.library")
 if(!dir.exists(file.path(groundhog.folder))) {dir.create(file.path(groundhog.folder))}
 set.groundhog.folder(groundhog.folder)
 groundhog.day = "2021-01-01"
-pkgs=c("ncdf4", "easyNCDF", "lubridate", "tidyverse", "data.table", "doParallel", "foreach")
+pkgs=c("ncdf4", "easyNCDF", "lubridate", "tidyverse", "data.table")
 groundhog.library(pkgs, groundhog.day)
 
 # graphics info

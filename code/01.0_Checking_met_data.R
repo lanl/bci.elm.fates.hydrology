@@ -10,7 +10,6 @@ graphics.off()
 #### Written  with R version 4 ###
 #*******************************************
 #*
-#*if (!require("groundhog")) install.packages("groundhog");
 if (!require("groundhog")) install.packages("groundhog")
 library(groundhog)
 groundhog.folder <- paste0("groundhog.library")
