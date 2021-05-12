@@ -1,8 +1,8 @@
-##---------------------------
+#*******************************************
 # Generating growth correlates from best-fit swp
 # Author: Rutuja Chitra-Tarak
 # First written: Oct 3, 2019
-##---------------------------
+#*******************************************
 # New model:
 #   growthsp = a+ b * Btransp, 
 # where Btransp=i=1i=zRootFracz, sp * f(swpz, tlpsp), 
@@ -37,9 +37,9 @@ soil.depths <- as.numeric(nc$var[['H2OSOI']]$dim[[2]]$vals) # 15 depths in m
 
 mini.date <- seq(from = as.Date("1990-01-01"), to = as.Date("2018-12-31"), by = "day")
 
-##-----------------------------
-## get best-fit SOILPSI or swp
-##-----------------------------
+#*******************************************
+## get best-fit SOILPSI or swp ----
+#*******************************************
 load(file.path("data-raw/extract", current.folder, "best-fits/extract/SOILPSI.h1.extract.Rdata"))
 # load(file.path("data-raw/extract", current.folder, "extract/SOILPSI.h1.extract.Rdata"))
 psi.obs <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "date") %>%
@@ -72,11 +72,11 @@ psi.mean <- psi %>%
   arrange(depth) %>% subset(!is.na(psi)) %>% droplevels()
 usethis::use_data(psi.mean, overwrite = TRUE)
 
-###
+#*******************************************
 #### BTRAN: Obs versus model #-------
-####
-# Daily #------
-####
+#*******************************************
+# BTRAN Daily #------
+#*******************************************
 load(file.path("data-raw/extract", current.folder, "best-fits/extract/BTRAN.h1.extract.Rdata"))
 
 mod.btran.d <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "date") %>%
@@ -103,9 +103,9 @@ btran.stat <- btran %>%
 usethis::use_data(btran, overwrite = TRUE)
 usethis::use_data(btran.stat, overwrite = TRUE)
 
-##-------------------------------
-## get growth factor = f(swp)
-##-------------------------------
+
+## get growth factor = f(swp) ----
+
 traits.indi <- read.csv("data-raw/hydraulic_traits_panama_kunert.csv") # Nobby's data
 tlp <- traits.indi %>% group_by(sp) %>% select(-idividual, -ind_ID) %>%
   summarise(tlp = mean(mean_TLP_Mpa, na.rm = TRUE)) %>% 
@@ -139,9 +139,9 @@ write.table(swp.gfac, file = file.path("results", current.folder, "swp.gfac_for_
 
 usethis::use_data(swp.gfac, overwrite = TRUE)
 
-##-------------------------------
-## soil water content 
-##-------------------------------
+#*******************************************
+## soil water content ----
+#*******************************************
 
 load(file.path("data-raw/extract", current.folder, "best-fits/extract/H2OSOI.h1.extract.Rdata"))
 # load(file.path("data-raw/extract", current.folder, "extract/SOILPSI.h1.extract.Rdata"))
@@ -171,9 +171,8 @@ write.csv(swc, file = file.path("results", current.folder, "swc_model_daily_all_
 
 usethis::use_data(swc, overwrite = TRUE)
 
-##-------------------------------
-## Plant available water content 
-##-------------------------------
+
+## Plant available water content ----
 
 ### swc - water content at wilting point
 ### water content at wilting point, using Clapp & Hornberger eqn 1978:
@@ -203,9 +202,9 @@ rm(swc, swc.df)
 usethis::use_data(paw, overwrite = TRUE)
 
 
-##-----------------------------
-## get best-fit GPP
-##-----------------------------
+#*******************************************
+## get best-fit GPP ----
+#*******************************************
 load(file.path("data-raw/extract", current.folder, "best-fits/extract/GPP.h1.extract.Rdata"))
 # load(file.path("data-raw/extract", current.folder, "extract/SOILPSI.h1.extract.Rdata"))
 mod.gpp.d <- setDT(as.data.frame(t(var.res.arr[[1]])), keep.rownames = "date") %>%

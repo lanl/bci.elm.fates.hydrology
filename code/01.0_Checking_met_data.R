@@ -5,7 +5,7 @@ rm(list = ls())
 graphics.off()
 
 #*******************************************
-####   Load Libraries, Prep for graphics, folders  ####
+####   Load Libraries, Prep for graphics, folders  
 #*******************************************
 #### Written  with R version 4 ###
 #*******************************************
@@ -21,12 +21,12 @@ pkgs=c('ncdf4', 'tidyverse', 'data.table', 'chron')
 groundhog.library(pkgs, groundhog.day)
 library(bci.hydromet)
 
-###-------------------
-### Recycle climate drivers. Use 1985-1994 to substitute 1975-1984
+#*******************************************
+### Recycle climate drivers. Use 1985-1994 to substitute 1975-1984 ---
 ### But use rainfall from rainguage data
-###-------------------
-### Boris's data - 2018 substituted by rutuja
-###-------------------
+#*******************************************
+### Boris's data - 2018 substituted by rutuja ----
+#*******************************************
 raw.dat <- read.csv("data-raw/BCI_1985_2018c_mod_2018substituted.csv")
 str(raw.dat)
 # converting to system time zone
@@ -153,8 +153,9 @@ View(raw.dat.moyr)
 
 #*******************************************
 
-
-
+#*******************************************
+# Check .nc data ----
+#*******************************************
 path = "data-raw/ConvertMetCSVtoCLM-expand-format/NCOut/bci_0.1x0.1_met.v5.1/CLM1PT_data"
 
 all.files = list.files(
@@ -208,7 +209,7 @@ attr(time.vec1, "tzone") <- "GMT"
 head(time.vec1)
 tail(time.vec1)
 ## this converts to system time zone
-#----
+#*******************************************
 
 nc.nvars <- ncin$nvars
 var.name <- vector()
@@ -290,9 +291,9 @@ ggplot(xx.long, aes(x = datetime, y = value)) +
   geom_point() +
   facet_wrap( ~ variable, scales = "free_y")
 
-# ###-------------------
-# ### Ryan's data
-# ###-------------------
+#*******************************************
+# ### Ryan's data ----
+#*******************************************
 # unix.dat <- read.csv("data-raw/BCI_1985_2018_unix2.csv", header = TRUE)
 # # unix.dat <- read.csv("data-raw/BCI_1985_2018c_mod.csv", header = TRUE)
 # head(unix.dat)
