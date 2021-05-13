@@ -237,9 +237,10 @@ extractres_h2 <-
     
     # filter.arr <-
     #   read.table(file.path(wd, filterFile), header = F) # on server
-    filter.arr <- read.table(file.path("data-raw", filterFile), header = F) # on desktop
+    filter.arr <-
+      read.table(file.path("data-raw/extract/", current.folder, filterFile), header = F) # on desktop
     sam.vec <-
-      c(sam.start:sam.end)[filter.arr$V1[c(sam.start:sam.end)]]
+      sam.vector[filter.arr$V1[sam.vector]]
     nsam <- length(sam.vec)
     
     ## to get the length of value vector (for H2OSOI the number of depths)#-----
