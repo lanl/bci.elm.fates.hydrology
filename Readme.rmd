@@ -57,7 +57,7 @@ These are transferred to the server.
 ### 4. Re-Run simulations for best-fits for the entire study period
 
 Now for the chosen best-fits re-run simulations covering the entire time-period of 1985-2018
-Follow Google Doc 4.0_Running ELM-FATES for best-fit parameter ensembles (and `code/12.0_Prep_for_Best-fit_case_runs.R` to generate par.sam numbers seperated by commas): <https://docs.google.com/document/d/1q6gC5nPrlcnaxl7WvHHVr-Yzu2xBZlIu4b1OcHdGdOc/edit#heading=h.mn9abqhwo6l5>
+Follow Google Doc 4.0_Running ELM-FATES for best-fit parameter ensembles @ Shared drive/Rutuja_work/web_only/ <https://docs.google.com/document/d/1V2UK_iSdXmkq3jR3TyowW7YllvrC7OVi/edit#heading=h.gjdgxs> (and `code/12.0_Prep_for_Best-fit_case_runs.R` to generate par.sam numbers seperated by commas)
 
 ### 5. Extract, plot and save Soil Water Potentials as a data-package
 
