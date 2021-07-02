@@ -6,8 +6,7 @@ output:
   md_document:   
   variant: markdown_github
   pdf_document: default
-subtitle: Hydraulically-vulnerable trees survive on deep-water access during droughts
-  in a tropical forest
+subtitle: Hydraulically-vulnerable trees survive on deep-water access during droughts in a tropical forest
 ---
 
 ```{r setup, include=FALSE}
