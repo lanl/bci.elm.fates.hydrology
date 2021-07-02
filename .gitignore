@@ -5,18 +5,26 @@
 !*/
 # Un-ignore specific files under subtree
 !R/**
-!Code/**
+!code/**
 ## Recursively allow files under subtree
 #!/data/**
 ## but not these files
 !.gitignore
-!DESCRIPTION
 !*.rmd
+!*.Rmd
 !*.md
-groundhog.library/*
-data-raw/
+!*.py
+!*.xml
+!data-raw/ConvertMetCSVtoCLM-expand-format/*
+!data-raw/Readme for digitising Matteo's TDR calibration curve.docx
 # https://stackoverflow.com/questions/44568184/gitignore-everything-except-a-subfolder-with-every-content
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+**/groundhog.library/
+.DS_Store
+data-raw/ConvertMetCSVtoCLM-expand-format/README.md
+data-raw/ConvertMetCSVtoCLM-expand-format/LICENSE
+data-raw/FatesPFTIndexSwapper.py
+data-raw/modify_fates_paramfile.py
