@@ -3,6 +3,8 @@ title: "Workflow Part II: ELM-FATES calibration for Soil Water Potentials"
 author: "Rutuja Chitra-Tarak"
 date: "12/2/2019"
 output: 
+  md_document:   
+  variant: markdown_github
   pdf_document: default
 subtitle: Hydraulically-vulnerable trees survive on deep-water access during droughts
   in a tropical forest
@@ -12,7 +14,9 @@ subtitle: Hydraulically-vulnerable trees survive on deep-water access during dro
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Scripts in this repo are a part of the workflow associated with the following manuscript: Chitra-Tarak, R, C Xu, S Aguilar, K Anderson-Teixeira, J Chambers, M Detto, B Faybishenko, RA Fisher, R Knox, C Koven, L Kueppers, N Kunert, SJ Kupers, NG McDowell, BD Newman, SR Paton, R Pérez, L Ruiz, L Sack, JM Warren, BT Wolfe, C Wright, SJ Wright, J Zailaa, SM McMahon (2021) Hydraulically vulnerable trees survive on deep-water access during droughts in a tropical forest. New Phytologist. https: //doi.org/10.1111/nph.17464
+Scripts in this repo are a part of the workflow associated with the following manuscript: 
+
+Chitra-Tarak, R, C Xu, S Aguilar, K Anderson-Teixeira, J Chambers, M Detto, B Faybishenko, RA Fisher, R Knox, C Koven, L Kueppers, N Kunert, SJ Kupers, NG McDowell, BD Newman, SR Paton, R Pérez, L Ruiz, L Sack, JM Warren, BT Wolfe, C Wright, SJ Wright, J Zailaa, SM McMahon (2021) Hydraulically vulnerable trees survive on deep-water access during droughts in a tropical forest. New Phytologist. https: //doi.org/10.1111/nph.17464
 
 For the full work-flow and output datasets associated with the above manuscript see the following archived dataset:
 
